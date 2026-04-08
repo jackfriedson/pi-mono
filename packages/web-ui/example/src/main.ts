@@ -9,6 +9,7 @@ import {
 	CustomProvidersStore,
 	createJavaScriptReplTool,
 	IndexedDBStorageBackend,
+	isUserMessageWithAttachments,
 	// PersistentStorageDialog, // TODO: Fix - currently broken
 	ProviderKeysStore,
 	ProvidersModelsTab,
@@ -69,9 +70,12 @@ let agent: Agent;
 let chatPanel: ChatPanel;
 let agentUnsubscribe: (() => void) | undefined;
 
+const isUserLikeMessage = (message: AgentMessage): boolean =>
+	message.role === "user" || isUserMessageWithAttachments(message);
+
 const generateTitle = (messages: AgentMessage[]): string => {
-	const firstUserMsg = messages.find((m) => m.role === "user" || m.role === "user-with-attachments");
-	if (!firstUserMsg || (firstUserMsg.role !== "user" && firstUserMsg.role !== "user-with-attachments")) return "";
+	const firstUserMsg = messages.find(isUserLikeMessage);
+	if (!firstUserMsg || (firstUserMsg.role !== "user" && !isUserMessageWithAttachments(firstUserMsg))) return "";
 
 	let text = "";
 	const content = firstUserMsg.content;
@@ -94,8 +98,8 @@ const generateTitle = (messages: AgentMessage[]): string => {
 };
 
 const shouldSaveSession = (messages: AgentMessage[]): boolean => {
-	const hasUserMsg = messages.some((m: any) => m.role === "user" || m.role === "user-with-attachments");
-	const hasAssistantMsg = messages.some((m: any) => m.role === "assistant");
+	const hasUserMsg = messages.some(isUserLikeMessage);
+	const hasAssistantMsg = messages.some((message) => message.role === "assistant");
 	return hasUserMsg && hasAssistantMsg;
 };
 
