@@ -1,7 +1,9 @@
+import type { ResponseCreateParamsStreaming } from "openai/resources/responses/responses.js";
 import type { SimpleStreamOptions, StreamFunction, StreamOptions } from "../types.js";
 export interface OpenAICodexResponsesOptions extends StreamOptions {
     reasoningEffort?: "none" | "minimal" | "low" | "medium" | "high" | "xhigh";
     reasoningSummary?: "auto" | "concise" | "detailed" | "off" | "on" | null;
+    serviceTier?: ResponseCreateParamsStreaming["service_tier"];
     textVerbosity?: "low" | "medium" | "high";
 }
 export declare const streamOpenAICodexResponses: StreamFunction<"openai-codex-responses", OpenAICodexResponsesOptions>;

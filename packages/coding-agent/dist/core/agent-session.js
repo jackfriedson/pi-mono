@@ -708,7 +708,7 @@ export class AgentSession {
             return;
         }
         // Flush any pending bash messages before the new prompt
-        this._flushPendingBashMessages();
+        await this._flushPendingBashMessages();
         // Validate model
         if (!this.model) {
             throw new Error("No model selected.\n\n" +
@@ -1060,7 +1060,7 @@ export class AgentSession {
         await this.sessionManager.appendModelChange(model.provider, model.id);
         this.settingsManager.setDefaultModelAndProvider(model.provider, model.id);
         // Re-clamp thinking level for new model's capabilities
-        this.setThinkingLevel(thinkingLevel);
+        await this.setThinkingLevel(thinkingLevel);
         await this._emitModelSelect(model, previousModel, "set");
     }
     /**
@@ -1095,7 +1095,7 @@ export class AgentSession {
         // - Explicit scoped model thinking level overrides current session level
         // - Undefined scoped model thinking level inherits the current session preference
         // setThinkingLevel clamps to model capabilities.
-        this.setThinkingLevel(thinkingLevel);
+        await this.setThinkingLevel(thinkingLevel);
         await this._emitModelSelect(next.model, currentModel, "cycle");
         return { model: next.model, thinkingLevel: this.thinkingLevel, isScoped: true };
     }
@@ -1115,7 +1115,7 @@ export class AgentSession {
         await this.sessionManager.appendModelChange(nextModel.provider, nextModel.id);
         this.settingsManager.setDefaultModelAndProvider(nextModel.provider, nextModel.id);
         // Re-clamp thinking level for new model's capabilities
-        this.setThinkingLevel(thinkingLevel);
+        await this.setThinkingLevel(thinkingLevel);
         await this._emitModelSelect(nextModel, currentModel, "cycle");
         return { model: nextModel, thinkingLevel: this.thinkingLevel, isScoped: false };
     }
@@ -1127,14 +1127,14 @@ export class AgentSession {
      * Clamps to model capabilities based on available thinking levels.
      * Saves to session and settings only if the level actually changes.
      */
-    setThinkingLevel(level) {
+    async setThinkingLevel(level) {
         const availableLevels = this.getAvailableThinkingLevels();
         const effectiveLevel = availableLevels.includes(level) ? level : this._clampThinkingLevel(level, availableLevels);
         // Only persist if actually changing
         const isChanging = effectiveLevel !== this.agent.state.thinkingLevel;
         this.agent.state.thinkingLevel = effectiveLevel;
         if (isChanging) {
-            void this.sessionManager.appendThinkingLevelChange(effectiveLevel);
+            await this.sessionManager.appendThinkingLevelChange(effectiveLevel);
             if (this.supportsThinking() || effectiveLevel !== "off") {
                 this.settingsManager.setDefaultThinkingLevel(effectiveLevel);
             }
@@ -1144,14 +1144,14 @@ export class AgentSession {
      * Cycle to next thinking level.
      * @returns New level, or undefined if model doesn't support thinking
      */
-    cycleThinkingLevel() {
+    async cycleThinkingLevel() {
         if (!this.supportsThinking())
             return undefined;
         const levels = this.getAvailableThinkingLevels();
         const currentIndex = levels.indexOf(this.thinkingLevel);
         const nextIndex = (currentIndex + 1) % levels.length;
         const nextLevel = levels[nextIndex];
-        this.setThinkingLevel(nextLevel);
+        await this.setThinkingLevel(nextLevel);
         return nextLevel;
     }
     /**
@@ -1712,17 +1712,17 @@ export class AgentSession {
                     });
                 });
             },
-            appendEntry: (customType, data) => {
-                void this.sessionManager.appendCustomEntry(customType, data);
+            appendEntry: async (customType, data) => {
+                await this.sessionManager.appendCustomEntry(customType, data);
             },
-            setSessionName: (name) => {
-                void this.sessionManager.appendSessionInfo(name);
+            setSessionName: async (name) => {
+                await this.sessionManager.appendSessionInfo(name);
             },
             getSessionName: () => {
                 return this.sessionManager.getSessionName();
             },
-            setLabel: (entryId, label) => {
-                void this.sessionManager.appendLabelChange(entryId, label);
+            setLabel: async (entryId, label) => {
+                await this.sessionManager.appendLabelChange(entryId, label);
             },
             getActiveTools: () => this.getActiveToolNames(),
             getAllTools: () => this.getAllTools(),
@@ -1736,7 +1736,7 @@ export class AgentSession {
                 return true;
             },
             getThinkingLevel: () => this.thinkingLevel,
-            setThinkingLevel: (level) => this.setThinkingLevel(level),
+            setThinkingLevel: async (level) => await this.setThinkingLevel(level),
         }, {
             getModel: () => this.model,
             isIdle: () => !this.isStreaming,
@@ -1912,8 +1912,8 @@ export class AgentSession {
         if (isContextOverflow(message, contextWindow))
             return false;
         const err = message.errorMessage;
-        // Match: overloaded_error, provider returned error, rate limit, 429, 500, 502, 503, 504, service unavailable, network/connection errors, fetch failed, terminated, retry delay exceeded
-        return /overloaded|provider.?returned.?error|rate.?limit|too many requests|429|500|502|503|504|service.?unavailable|server.?error|internal.?error|network.?error|connection.?error|connection.?refused|other side closed|fetch failed|upstream.?connect|reset before headers|socket hang up|timed? out|timeout|terminated|retry delay/i.test(err);
+        // Match: overloaded_error, provider returned error, rate limit, 429, 500, 502, 503, 504, service unavailable, network/connection errors, fetch failed, request ended without sending chunks, terminated, retry delay exceeded
+        return /overloaded|provider.?returned.?error|rate.?limit|too many requests|429|500|502|503|504|service.?unavailable|server.?error|internal.?error|network.?error|connection.?error|connection.?refused|other side closed|fetch failed|upstream.?connect|reset before headers|socket hang up|ended without|timed? out|timeout|terminated|retry delay/i.test(err);
     }
     /**
      * Handle retryable errors with exponential backoff.
@@ -2040,7 +2040,7 @@ export class AgentSession {
                 onChunk,
                 signal: this._bashAbortController.signal,
             });
-            this.recordBashResult(command, result, options);
+            await this.recordBashResult(command, result, options);
             return result;
         }
         finally {
@@ -2051,7 +2051,7 @@ export class AgentSession {
      * Record a bash execution result in session history.
      * Used by executeBash and by extensions that handle bash execution themselves.
      */
-    recordBashResult(command, result, options) {
+    async recordBashResult(command, result, options) {
         const bashMessage = {
             role: "bashExecution",
             command,
@@ -2072,7 +2072,7 @@ export class AgentSession {
             // Add to agent state immediately
             this.agent.state.messages.push(bashMessage);
             // Save to session
-            void this.sessionManager.appendMessage(bashMessage);
+            await this.sessionManager.appendMessage(bashMessage);
         }
     }
     /**
@@ -2093,14 +2093,14 @@ export class AgentSession {
      * Flush pending bash messages to agent state and session.
      * Called after agent turn completes to maintain proper message ordering.
      */
-    _flushPendingBashMessages() {
+    async _flushPendingBashMessages() {
         if (this._pendingBashMessages.length === 0)
             return;
         for (const bashMessage of this._pendingBashMessages) {
             // Add to agent state
             this.agent.state.messages.push(bashMessage);
             // Save to session
-            void this.sessionManager.appendMessage(bashMessage);
+            await this.sessionManager.appendMessage(bashMessage);
         }
         this._pendingBashMessages = [];
     }
@@ -2110,8 +2110,8 @@ export class AgentSession {
     /**
      * Set a display name for the current session.
      */
-    setSessionName(name) {
-        void this.sessionManager.appendSessionInfo(name);
+    async setSessionName(name) {
+        await this.sessionManager.appendSessionInfo(name);
     }
     // =========================================================================
     // Tree Navigation

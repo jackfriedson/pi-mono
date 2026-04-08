@@ -60,6 +60,7 @@ export declare class Editor implements Component, Focusable {
     private lastAction;
     private jumpMode;
     private preferredVisualCol;
+    private snappedFromCursorCol;
     private undoStack;
     onSubmit?: (text: string) => void;
     onChange?: (text: string) => void;
@@ -172,6 +173,10 @@ export declare class Editor implements Component, Focusable {
      * - length: length of this visual line segment
      */
     private buildVisualLineMap;
+    /**
+     * Find the visual line index that contains the given logical position.
+     */
+    private findVisualLineAt;
     /**
      * Find the visual line index for the current cursor position.
      */

@@ -16,6 +16,7 @@ export interface SettingsConfig {
     availableThemes: string[];
     hideThinkingBlock: boolean;
     collapseChangelog: boolean;
+    enableInstallTelemetry: boolean;
     doubleEscapeAction: "fork" | "tree" | "none";
     treeFilterMode: "default" | "no-tools" | "user-only" | "labeled-only" | "all";
     showHardwareCursor: boolean;
@@ -38,6 +39,7 @@ export interface SettingsCallbacks {
     onThemePreview?: (theme: string) => void;
     onHideThinkingBlockChange: (hidden: boolean) => void;
     onCollapseChangelogChange: (collapsed: boolean) => void;
+    onEnableInstallTelemetryChange: (enabled: boolean) => void;
     onDoubleEscapeActionChange: (action: "fork" | "tree" | "none") => void;
     onTreeFilterModeChange: (mode: "default" | "no-tools" | "user-only" | "labeled-only" | "all") => void;
     onShowHardwareCursorChange: (enabled: boolean) => void;

@@ -121,14 +121,17 @@ export function createExtensionRuntime(): ExtensionRuntime {
 	const notInitialized = () => {
 		throw new Error("Extension runtime not initialized. Action methods cannot be called during extension loading.");
 	};
+	const notInitializedAsync = async () => {
+		throw new Error("Extension runtime not initialized. Action methods cannot be called during extension loading.");
+	};
 
 	const runtime: ExtensionRuntime = {
 		sendMessage: notInitialized,
 		sendUserMessage: notInitialized,
-		appendEntry: notInitialized,
-		setSessionName: notInitialized,
+		appendEntry: notInitializedAsync,
+		setSessionName: notInitializedAsync,
 		getSessionName: notInitialized,
-		setLabel: notInitialized,
+		setLabel: notInitializedAsync,
 		getActiveTools: notInitialized,
 		getAllTools: notInitialized,
 		setActiveTools: notInitialized,
@@ -137,7 +140,7 @@ export function createExtensionRuntime(): ExtensionRuntime {
 		getCommands: notInitialized,
 		setModel: () => Promise.reject(new Error("Extension runtime not initialized")),
 		getThinkingLevel: notInitialized,
-		setThinkingLevel: notInitialized,
+		setThinkingLevel: notInitializedAsync,
 		flagValues: new Map(),
 		pendingProviderRegistrations: [],
 		// Pre-bind: queue registrations so bindCore() can flush them once the
@@ -227,20 +230,20 @@ function createExtensionAPI(
 			runtime.sendUserMessage(content, options);
 		},
 
-		appendEntry(customType: string, data?: unknown): void {
-			runtime.appendEntry(customType, data);
+		async appendEntry(customType: string, data?: unknown): Promise<void> {
+			await runtime.appendEntry(customType, data);
 		},
 
-		setSessionName(name: string): void {
-			runtime.setSessionName(name);
+		async setSessionName(name: string): Promise<void> {
+			await runtime.setSessionName(name);
 		},
 
 		getSessionName(): string | undefined {
 			return runtime.getSessionName();
 		},
 
-		setLabel(entryId: string, label: string | undefined): void {
-			runtime.setLabel(entryId, label);
+		async setLabel(entryId: string, label: string | undefined): Promise<void> {
+			await runtime.setLabel(entryId, label);
 		},
 
 		exec(command: string, args: string[], options?: ExecOptions) {
@@ -271,8 +274,8 @@ function createExtensionAPI(
 			return runtime.getThinkingLevel();
 		},
 
-		setThinkingLevel(level) {
-			runtime.setThinkingLevel(level);
+		async setThinkingLevel(level) {
+			await runtime.setThinkingLevel(level);
 		},
 
 		registerProvider(name: string, config: ProviderConfig) {
