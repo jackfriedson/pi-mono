@@ -7,12 +7,12 @@ import { assistantMsg, userMsg } from "../utilities.js";
 
 describe("SessionManager append and tree traversal", () => {
 	describe("append operations", () => {
-		it("appendMessage creates entry with correct parentId chain", () => {
+		it("appendMessage creates entry with correct parentId chain", async () => {
 			const session = SessionManager.inMemory();
 
-			const id1 = session.appendMessage(userMsg("first"));
-			const id2 = session.appendMessage(assistantMsg("second"));
-			const id3 = session.appendMessage(userMsg("third"));
+			const id1 = await session.appendMessage(userMsg("first"));
+			const id2 = await session.appendMessage(assistantMsg("second"));
+			const id3 = await session.appendMessage(userMsg("third"));
 
 			const entries = session.getEntries();
 			expect(entries).toHaveLength(3);
@@ -28,12 +28,12 @@ describe("SessionManager append and tree traversal", () => {
 			expect(entries[2].parentId).toBe(id2);
 		});
 
-		it("appendThinkingLevelChange integrates into tree", () => {
+		it("appendThinkingLevelChange integrates into tree", async () => {
 			const session = SessionManager.inMemory();
 
-			const msgId = session.appendMessage(userMsg("hello"));
-			const thinkingId = session.appendThinkingLevelChange("high");
-			const _msg2Id = session.appendMessage(assistantMsg("response"));
+			const msgId = await session.appendMessage(userMsg("hello"));
+			const thinkingId = await session.appendThinkingLevelChange("high");
+			const _msg2Id = await session.appendMessage(assistantMsg("response"));
 
 			const entries = session.getEntries();
 			expect(entries).toHaveLength(3);
@@ -46,12 +46,12 @@ describe("SessionManager append and tree traversal", () => {
 			expect(entries[2].parentId).toBe(thinkingId);
 		});
 
-		it("appendModelChange integrates into tree", () => {
+		it("appendModelChange integrates into tree", async () => {
 			const session = SessionManager.inMemory();
 
-			const msgId = session.appendMessage(userMsg("hello"));
-			const modelId = session.appendModelChange("openai", "gpt-4");
-			const _msg2Id = session.appendMessage(assistantMsg("response"));
+			const msgId = await session.appendMessage(userMsg("hello"));
+			const modelId = await session.appendModelChange("openai", "gpt-4");
+			const _msg2Id = await session.appendMessage(assistantMsg("response"));
 
 			const entries = session.getEntries();
 			const modelEntry = entries.find((e) => e.type === "model_change");
@@ -66,13 +66,13 @@ describe("SessionManager append and tree traversal", () => {
 			expect(entries[2].parentId).toBe(modelId);
 		});
 
-		it("appendCompaction integrates into tree", () => {
+		it("appendCompaction integrates into tree", async () => {
 			const session = SessionManager.inMemory();
 
-			const id1 = session.appendMessage(userMsg("1"));
-			const id2 = session.appendMessage(assistantMsg("2"));
-			const compactionId = session.appendCompaction("summary", id1, 1000);
-			const _id3 = session.appendMessage(userMsg("3"));
+			const id1 = await session.appendMessage(userMsg("1"));
+			const id2 = await session.appendMessage(assistantMsg("2"));
+			const compactionId = await session.appendCompaction("summary", id1, 1000);
+			const _id3 = await session.appendMessage(userMsg("3"));
 
 			const entries = session.getEntries();
 			const compactionEntry = entries.find((e) => e.type === "compaction");
@@ -88,12 +88,12 @@ describe("SessionManager append and tree traversal", () => {
 			expect(entries[3].parentId).toBe(compactionId);
 		});
 
-		it("appendCustomEntry integrates into tree", () => {
+		it("appendCustomEntry integrates into tree", async () => {
 			const session = SessionManager.inMemory();
 
-			const msgId = session.appendMessage(userMsg("hello"));
-			const customId = session.appendCustomEntry("my_data", { key: "value" });
-			const _msg2Id = session.appendMessage(assistantMsg("response"));
+			const msgId = await session.appendMessage(userMsg("hello"));
+			const customId = await session.appendCustomEntry("my_data", { key: "value" });
+			const _msg2Id = await session.appendMessage(assistantMsg("response"));
 
 			const entries = session.getEntries();
 			const customEntry = entries.find((e) => e.type === "custom") as CustomEntry;
@@ -106,57 +106,57 @@ describe("SessionManager append and tree traversal", () => {
 			expect(entries[2].parentId).toBe(customId);
 		});
 
-		it("leaf pointer advances after each append", () => {
+		it("leaf pointer advances after each append", async () => {
 			const session = SessionManager.inMemory();
 
 			expect(session.getLeafId()).toBeNull();
 
-			const id1 = session.appendMessage(userMsg("1"));
+			const id1 = await session.appendMessage(userMsg("1"));
 			expect(session.getLeafId()).toBe(id1);
 
-			const id2 = session.appendMessage(assistantMsg("2"));
+			const id2 = await session.appendMessage(assistantMsg("2"));
 			expect(session.getLeafId()).toBe(id2);
 
-			const id3 = session.appendThinkingLevelChange("high");
+			const id3 = await session.appendThinkingLevelChange("high");
 			expect(session.getLeafId()).toBe(id3);
 		});
 	});
 
 	describe("getPath", () => {
-		it("returns empty array for empty session", () => {
+		it("returns empty array for empty session", async () => {
 			const session = SessionManager.inMemory();
 			expect(session.getBranch()).toEqual([]);
 		});
 
-		it("returns single entry path", () => {
+		it("returns single entry path", async () => {
 			const session = SessionManager.inMemory();
-			const id = session.appendMessage(userMsg("hello"));
+			const id = await session.appendMessage(userMsg("hello"));
 
 			const path = session.getBranch();
 			expect(path).toHaveLength(1);
 			expect(path[0].id).toBe(id);
 		});
 
-		it("returns full path from root to leaf", () => {
+		it("returns full path from root to leaf", async () => {
 			const session = SessionManager.inMemory();
 
-			const id1 = session.appendMessage(userMsg("1"));
-			const id2 = session.appendMessage(assistantMsg("2"));
-			const id3 = session.appendThinkingLevelChange("high");
-			const id4 = session.appendMessage(userMsg("3"));
+			const id1 = await session.appendMessage(userMsg("1"));
+			const id2 = await session.appendMessage(assistantMsg("2"));
+			const id3 = await session.appendThinkingLevelChange("high");
+			const id4 = await session.appendMessage(userMsg("3"));
 
 			const path = session.getBranch();
 			expect(path).toHaveLength(4);
 			expect(path.map((e) => e.id)).toEqual([id1, id2, id3, id4]);
 		});
 
-		it("returns path from specified entry to root", () => {
+		it("returns path from specified entry to root", async () => {
 			const session = SessionManager.inMemory();
 
-			const id1 = session.appendMessage(userMsg("1"));
-			const id2 = session.appendMessage(assistantMsg("2"));
-			const _id3 = session.appendMessage(userMsg("3"));
-			const _id4 = session.appendMessage(assistantMsg("4"));
+			const id1 = await session.appendMessage(userMsg("1"));
+			const id2 = await session.appendMessage(assistantMsg("2"));
+			const _id3 = await session.appendMessage(userMsg("3"));
+			const _id4 = await session.appendMessage(assistantMsg("4"));
 
 			const path = session.getBranch(id2);
 			expect(path).toHaveLength(2);
@@ -165,17 +165,17 @@ describe("SessionManager append and tree traversal", () => {
 	});
 
 	describe("getTree", () => {
-		it("returns empty array for empty session", () => {
+		it("returns empty array for empty session", async () => {
 			const session = SessionManager.inMemory();
 			expect(session.getTree()).toEqual([]);
 		});
 
-		it("returns single root for linear session", () => {
+		it("returns single root for linear session", async () => {
 			const session = SessionManager.inMemory();
 
-			const id1 = session.appendMessage(userMsg("1"));
-			const id2 = session.appendMessage(assistantMsg("2"));
-			const id3 = session.appendMessage(userMsg("3"));
+			const id1 = await session.appendMessage(userMsg("1"));
+			const id2 = await session.appendMessage(assistantMsg("2"));
+			const id3 = await session.appendMessage(userMsg("3"));
 
 			const tree = session.getTree();
 			expect(tree).toHaveLength(1);
@@ -189,17 +189,17 @@ describe("SessionManager append and tree traversal", () => {
 			expect(root.children[0].children[0].children).toHaveLength(0);
 		});
 
-		it("returns tree with branches after branch", () => {
+		it("returns tree with branches after branch", async () => {
 			const session = SessionManager.inMemory();
 
 			// Build: 1 -> 2 -> 3
-			const id1 = session.appendMessage(userMsg("1"));
-			const id2 = session.appendMessage(assistantMsg("2"));
-			const id3 = session.appendMessage(userMsg("3"));
+			const id1 = await session.appendMessage(userMsg("1"));
+			const id2 = await session.appendMessage(assistantMsg("2"));
+			const id3 = await session.appendMessage(userMsg("3"));
 
 			// Branch from id2, add new path: 2 -> 4
-			session.branch(id2);
-			const id4 = session.appendMessage(userMsg("4-branch"));
+			await session.branch(id2);
+			const id4 = await session.appendMessage(userMsg("4-branch"));
 
 			const tree = session.getTree();
 			expect(tree).toHaveLength(1);
@@ -216,23 +216,23 @@ describe("SessionManager append and tree traversal", () => {
 			expect(childIds).toEqual([id3, id4].sort());
 		});
 
-		it("handles multiple branches at same point", () => {
+		it("handles multiple branches at same point", async () => {
 			const session = SessionManager.inMemory();
 
-			const _id1 = session.appendMessage(userMsg("root"));
-			const id2 = session.appendMessage(assistantMsg("response"));
+			const _id1 = await session.appendMessage(userMsg("root"));
+			const id2 = await session.appendMessage(assistantMsg("response"));
 
 			// Branch A
-			session.branch(id2);
-			const idA = session.appendMessage(userMsg("branch-A"));
+			await session.branch(id2);
+			const idA = await session.appendMessage(userMsg("branch-A"));
 
 			// Branch B
-			session.branch(id2);
-			const idB = session.appendMessage(userMsg("branch-B"));
+			await session.branch(id2);
+			const idB = await session.appendMessage(userMsg("branch-B"));
 
 			// Branch C
-			session.branch(id2);
-			const idC = session.appendMessage(userMsg("branch-C"));
+			await session.branch(id2);
+			const idC = await session.appendMessage(userMsg("branch-C"));
 
 			const tree = session.getTree();
 			const node2 = tree[0].children[0];
@@ -243,23 +243,23 @@ describe("SessionManager append and tree traversal", () => {
 			expect(branchIds).toEqual([idA, idB, idC].sort());
 		});
 
-		it("handles deep branching", () => {
+		it("handles deep branching", async () => {
 			const session = SessionManager.inMemory();
 
 			// Main path: 1 -> 2 -> 3 -> 4
-			const _id1 = session.appendMessage(userMsg("1"));
-			const id2 = session.appendMessage(assistantMsg("2"));
-			const id3 = session.appendMessage(userMsg("3"));
-			const _id4 = session.appendMessage(assistantMsg("4"));
+			const _id1 = await session.appendMessage(userMsg("1"));
+			const id2 = await session.appendMessage(assistantMsg("2"));
+			const id3 = await session.appendMessage(userMsg("3"));
+			const _id4 = await session.appendMessage(assistantMsg("4"));
 
 			// Branch from 2: 2 -> 5 -> 6
-			session.branch(id2);
-			const id5 = session.appendMessage(userMsg("5"));
-			const _id6 = session.appendMessage(assistantMsg("6"));
+			await session.branch(id2);
+			const id5 = await session.appendMessage(userMsg("5"));
+			const _id6 = await session.appendMessage(assistantMsg("6"));
 
 			// Branch from 5: 5 -> 7
-			session.branch(id5);
-			const _id7 = session.appendMessage(userMsg("7"));
+			await session.branch(id5);
+			const _id7 = await session.appendMessage(userMsg("7"));
 
 			const tree = session.getTree();
 
@@ -276,34 +276,34 @@ describe("SessionManager append and tree traversal", () => {
 	});
 
 	describe("branch", () => {
-		it("moves leaf pointer to specified entry", () => {
+		it("moves leaf pointer to specified entry", async () => {
 			const session = SessionManager.inMemory();
 
-			const id1 = session.appendMessage(userMsg("1"));
-			const _id2 = session.appendMessage(assistantMsg("2"));
-			const id3 = session.appendMessage(userMsg("3"));
+			const id1 = await session.appendMessage(userMsg("1"));
+			const _id2 = await session.appendMessage(assistantMsg("2"));
+			const id3 = await session.appendMessage(userMsg("3"));
 
 			expect(session.getLeafId()).toBe(id3);
 
-			session.branch(id1);
+			await session.branch(id1);
 			expect(session.getLeafId()).toBe(id1);
 		});
 
-		it("throws for non-existent entry", () => {
+		it("throws for non-existent entry", async () => {
 			const session = SessionManager.inMemory();
-			session.appendMessage(userMsg("hello"));
+			await session.appendMessage(userMsg("hello"));
 
-			expect(() => session.branch("nonexistent")).toThrow("Entry nonexistent not found");
+			await expect(session.branch("nonexistent")).rejects.toThrow("Entry nonexistent not found");
 		});
 
-		it("new appends become children of branch point", () => {
+		it("new appends become children of branch point", async () => {
 			const session = SessionManager.inMemory();
 
-			const id1 = session.appendMessage(userMsg("1"));
-			const _id2 = session.appendMessage(assistantMsg("2"));
+			const id1 = await session.appendMessage(userMsg("1"));
+			const _id2 = await session.appendMessage(assistantMsg("2"));
 
-			session.branch(id1);
-			const id3 = session.appendMessage(userMsg("branched"));
+			await session.branch(id1);
+			const id3 = await session.appendMessage(userMsg("branched"));
 
 			const entries = session.getEntries();
 			const branchedEntry = entries.find((e) => e.id === id3)!;
@@ -312,14 +312,14 @@ describe("SessionManager append and tree traversal", () => {
 	});
 
 	describe("branchWithSummary", () => {
-		it("inserts branch summary and advances leaf", () => {
+		it("inserts branch summary and advances leaf", async () => {
 			const session = SessionManager.inMemory();
 
-			const id1 = session.appendMessage(userMsg("1"));
-			const _id2 = session.appendMessage(assistantMsg("2"));
-			const _id3 = session.appendMessage(userMsg("3"));
+			const id1 = await session.appendMessage(userMsg("1"));
+			const _id2 = await session.appendMessage(assistantMsg("2"));
+			const _id3 = await session.appendMessage(userMsg("3"));
 
-			const summaryId = session.branchWithSummary(id1, "Summary of abandoned work");
+			const summaryId = await session.branchWithSummary(id1, "Summary of abandoned work");
 
 			expect(session.getLeafId()).toBe(summaryId);
 
@@ -332,25 +332,27 @@ describe("SessionManager append and tree traversal", () => {
 			}
 		});
 
-		it("throws for non-existent entry", () => {
+		it("throws for non-existent entry", async () => {
 			const session = SessionManager.inMemory();
-			session.appendMessage(userMsg("hello"));
+			await session.appendMessage(userMsg("hello"));
 
-			expect(() => session.branchWithSummary("nonexistent", "summary")).toThrow("Entry nonexistent not found");
+			await expect(session.branchWithSummary("nonexistent", "summary")).rejects.toThrow(
+				"Entry nonexistent not found",
+			);
 		});
 	});
 
 	describe("getLeafEntry", () => {
-		it("returns undefined for empty session", () => {
+		it("returns undefined for empty session", async () => {
 			const session = SessionManager.inMemory();
 			expect(session.getLeafEntry()).toBeUndefined();
 		});
 
-		it("returns current leaf entry", () => {
+		it("returns current leaf entry", async () => {
 			const session = SessionManager.inMemory();
 
-			session.appendMessage(userMsg("1"));
-			const id2 = session.appendMessage(assistantMsg("2"));
+			await session.appendMessage(userMsg("1"));
+			const id2 = await session.appendMessage(assistantMsg("2"));
 
 			const leaf = session.getLeafEntry();
 			expect(leaf).toBeDefined();
@@ -359,16 +361,16 @@ describe("SessionManager append and tree traversal", () => {
 	});
 
 	describe("getEntry", () => {
-		it("returns undefined for non-existent id", () => {
+		it("returns undefined for non-existent id", async () => {
 			const session = SessionManager.inMemory();
 			expect(session.getEntry("nonexistent")).toBeUndefined();
 		});
 
-		it("returns entry by id", () => {
+		it("returns entry by id", async () => {
 			const session = SessionManager.inMemory();
 
-			const id1 = session.appendMessage(userMsg("first"));
-			const id2 = session.appendMessage(assistantMsg("second"));
+			const id1 = await session.appendMessage(userMsg("first"));
+			const id2 = await session.appendMessage(assistantMsg("second"));
 
 			const entry1 = session.getEntry(id1);
 			expect(entry1).toBeDefined();
@@ -386,17 +388,17 @@ describe("SessionManager append and tree traversal", () => {
 	});
 
 	describe("buildSessionContext with branches", () => {
-		it("returns messages from current branch only", () => {
+		it("returns messages from current branch only", async () => {
 			const session = SessionManager.inMemory();
 
 			// Main: 1 -> 2 -> 3
-			session.appendMessage(userMsg("msg1"));
-			const id2 = session.appendMessage(assistantMsg("msg2"));
-			session.appendMessage(userMsg("msg3"));
+			await session.appendMessage(userMsg("msg1"));
+			const id2 = await session.appendMessage(assistantMsg("msg2"));
+			await session.appendMessage(userMsg("msg3"));
 
 			// Branch from 2: 2 -> 4
-			session.branch(id2);
-			session.appendMessage(assistantMsg("msg4-branch"));
+			await session.branch(id2);
+			await session.appendMessage(assistantMsg("msg4-branch"));
 
 			const ctx = session.buildSessionContext();
 			expect(ctx.messages).toHaveLength(3); // msg1, msg2, msg4-branch (not msg3)
@@ -409,28 +411,28 @@ describe("SessionManager append and tree traversal", () => {
 });
 
 describe("createBranchedSession", () => {
-	it("throws for non-existent entry", () => {
+	it("throws for non-existent entry", async () => {
 		const session = SessionManager.inMemory();
-		session.appendMessage(userMsg("hello"));
+		await session.appendMessage(userMsg("hello"));
 
-		expect(() => session.createBranchedSession("nonexistent")).toThrow("Entry nonexistent not found");
+		await expect(session.createBranchedSession("nonexistent")).rejects.toThrow("Entry nonexistent not found");
 	});
 
-	it("creates new session with path to specified leaf (in-memory)", () => {
+	it("creates new session with path to specified leaf (in-memory)", async () => {
 		const session = SessionManager.inMemory();
 
 		// Build: 1 -> 2 -> 3 -> 4
-		const id1 = session.appendMessage(userMsg("1"));
-		const id2 = session.appendMessage(assistantMsg("2"));
-		const id3 = session.appendMessage(userMsg("3"));
-		session.appendMessage(assistantMsg("4"));
+		const id1 = await session.appendMessage(userMsg("1"));
+		const id2 = await session.appendMessage(assistantMsg("2"));
+		const id3 = await session.appendMessage(userMsg("3"));
+		await session.appendMessage(assistantMsg("4"));
 
 		// Branch from 3: 3 -> 5
-		session.branch(id3);
-		const _id5 = session.appendMessage(userMsg("5"));
+		await session.branch(id3);
+		const _id5 = await session.appendMessage(userMsg("5"));
 
 		// Create branched session from id2 (should only have 1 -> 2)
-		const result = session.createBranchedSession(id2);
+		const result = await session.createBranchedSession(id2);
 		expect(result).toBeUndefined(); // in-memory returns null
 
 		// Session should now only have entries 1 and 2
@@ -440,41 +442,41 @@ describe("createBranchedSession", () => {
 		expect(entries[1].id).toBe(id2);
 	});
 
-	it("extracts correct path from branched tree", () => {
+	it("extracts correct path from branched tree", async () => {
 		const session = SessionManager.inMemory();
 
 		// Build: 1 -> 2 -> 3
-		const id1 = session.appendMessage(userMsg("1"));
-		const id2 = session.appendMessage(assistantMsg("2"));
-		session.appendMessage(userMsg("3"));
+		const id1 = await session.appendMessage(userMsg("1"));
+		const id2 = await session.appendMessage(assistantMsg("2"));
+		await session.appendMessage(userMsg("3"));
 
 		// Branch from 2: 2 -> 4 -> 5
-		session.branch(id2);
-		const id4 = session.appendMessage(userMsg("4"));
-		const id5 = session.appendMessage(assistantMsg("5"));
+		await session.branch(id2);
+		const id4 = await session.appendMessage(userMsg("4"));
+		const id5 = await session.appendMessage(assistantMsg("5"));
 
 		// Create branched session from id5 (should have 1 -> 2 -> 4 -> 5)
-		session.createBranchedSession(id5);
+		await session.createBranchedSession(id5);
 
 		const entries = session.getEntries();
 		expect(entries).toHaveLength(4);
 		expect(entries.map((e) => e.id)).toEqual([id1, id2, id4, id5]);
 	});
 
-	it("does not duplicate entries when forking from first user message", () => {
+	it("does not duplicate entries when forking from first user message", async () => {
 		const tempDir = join(tmpdir(), `session-fork-dedup-${Date.now()}`);
 		mkdirSync(tempDir, { recursive: true });
 
 		try {
 			// Create a persisted session with a couple of turns
 			const session = SessionManager.create(tempDir, tempDir);
-			const id1 = session.appendMessage(userMsg("first question"));
-			session.appendMessage(assistantMsg("first answer"));
-			session.appendMessage(userMsg("second question"));
-			session.appendMessage(assistantMsg("second answer"));
+			const id1 = await session.appendMessage(userMsg("first question"));
+			await session.appendMessage(assistantMsg("first answer"));
+			await session.appendMessage(userMsg("second question"));
+			await session.appendMessage(assistantMsg("second answer"));
 
 			// Fork from the very first user message (no assistant in the branched path)
-			const newFile = session.createBranchedSession(id1);
+			const newFile = await session.createBranchedSession(id1);
 			expect(newFile).toBeDefined();
 
 			// The branched path has no assistant, so the file should not exist yet
@@ -482,10 +484,10 @@ describe("createBranchedSession", () => {
 			expect(existsSync(newFile!)).toBe(false);
 
 			// Simulate extension adding entry before assistant (like preset on turn_start)
-			session.appendCustomEntry("preset-state", { name: "plan" });
+			await session.appendCustomEntry("preset-state", { name: "plan" });
 
 			// Now the assistant responds
-			session.appendMessage(assistantMsg("new answer"));
+			await session.appendMessage(assistantMsg("new answer"));
 
 			// File should now exist with exactly one header and no duplicate IDs
 			expect(existsSync(newFile!)).toBe(true);
@@ -505,19 +507,19 @@ describe("createBranchedSession", () => {
 		}
 	});
 
-	it("writes file immediately when forking from a point with assistant messages", () => {
+	it("writes file immediately when forking from a point with assistant messages", async () => {
 		const tempDir = join(tmpdir(), `session-fork-with-assistant-${Date.now()}`);
 		mkdirSync(tempDir, { recursive: true });
 
 		try {
 			const session = SessionManager.create(tempDir, tempDir);
-			session.appendMessage(userMsg("first question"));
-			const id2 = session.appendMessage(assistantMsg("first answer"));
-			session.appendMessage(userMsg("second question"));
-			session.appendMessage(assistantMsg("second answer"));
+			await session.appendMessage(userMsg("first question"));
+			const id2 = await session.appendMessage(assistantMsg("first answer"));
+			await session.appendMessage(userMsg("second question"));
+			await session.appendMessage(assistantMsg("second answer"));
 
 			// Fork including the assistant message
-			const newFile = session.createBranchedSession(id2);
+			const newFile = await session.createBranchedSession(id2);
 			expect(newFile).toBeDefined();
 
 			// Path includes an assistant, so file should be written immediately

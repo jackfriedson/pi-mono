@@ -181,6 +181,62 @@ export interface SessionInfo {
 	allMessagesText: string;
 }
 
+/**
+ * Minimal pluggable session manager contract consumed by the SDK/runtime.
+ *
+ * Implement this interface to provide alternative storage backends. Static
+ * factory and listing helpers remain on the default JSONL-backed implementation
+ * exported as the `SessionManager` value.
+ */
+export interface SessionManager {
+	isPersisted(): boolean;
+	getCwd(): string;
+	getSessionDir(): string;
+	getSessionId(): string;
+	getSessionFile(): string | undefined;
+	getLeafId(): string | null;
+	getLeafEntry(): SessionEntry | undefined;
+	getEntry(id: string): SessionEntry | undefined;
+	getChildren(parentId: string): SessionEntry[];
+	getLabel(id: string): string | undefined;
+	getBranch(fromId?: string): SessionEntry[];
+	buildSessionContext(): SessionContext;
+	getHeader(): SessionHeader | null;
+	getEntries(): SessionEntry[];
+	getTree(): SessionTreeNode[];
+	getSessionName(): string | undefined;
+	setSessionFile(sessionFile: string): Promise<void>;
+	newSession(options?: NewSessionOptions): Promise<string | undefined>;
+	appendMessage(message: Message | CustomMessage | BashExecutionMessage): Promise<string>;
+	appendThinkingLevelChange(thinkingLevel: string): Promise<string>;
+	appendModelChange(provider: string, modelId: string): Promise<string>;
+	appendCompaction<T = unknown>(
+		summary: string,
+		firstKeptEntryId: string,
+		tokensBefore: number,
+		details?: T,
+		fromHook?: boolean,
+	): Promise<string>;
+	appendCustomEntry(customType: string, data?: unknown): Promise<string>;
+	appendSessionInfo(name: string): Promise<string>;
+	appendCustomMessageEntry<T = unknown>(
+		customType: string,
+		content: string | (TextContent | ImageContent)[],
+		display: boolean,
+		details?: T,
+	): Promise<string>;
+	appendLabelChange(targetId: string, label: string | undefined): Promise<string>;
+	branch(branchFromId: string): Promise<void>;
+	resetLeaf(): Promise<void>;
+	branchWithSummary(
+		branchFromId: string | null,
+		summary: string,
+		details?: unknown,
+		fromHook?: boolean,
+	): Promise<string>;
+	createBranchedSession(leafId: string): Promise<string | undefined>;
+}
+
 export type ReadonlySessionManager = Pick<
 	SessionManager,
 	| "getCwd"
@@ -666,7 +722,7 @@ async function listSessionsFromDir(
  * Use buildSessionContext() to get the resolved message list for the LLM, which
  * handles compaction summaries and follows the path from root to current leaf.
  */
-export class SessionManager {
+export class JsonlSessionManager implements SessionManager {
 	private sessionId: string = "";
 	private sessionFile: string | undefined;
 	private sessionDir: string;
@@ -695,7 +751,7 @@ export class SessionManager {
 	}
 
 	/** Switch to a different session file (used for resume and branching) */
-	setSessionFile(sessionFile: string): void {
+	async setSessionFile(sessionFile: string): Promise<void> {
 		this.sessionFile = resolve(sessionFile);
 		if (existsSync(this.sessionFile)) {
 			this.fileEntries = loadEntriesFromFile(this.sessionFile);
@@ -727,7 +783,7 @@ export class SessionManager {
 		}
 	}
 
-	newSession(options?: NewSessionOptions): string | undefined {
+	async newSession(options?: NewSessionOptions): Promise<string | undefined> {
 		this.sessionId = options?.id ?? createSessionId();
 		const timestamp = new Date().toISOString();
 		const header: SessionHeader = {
@@ -831,7 +887,7 @@ export class SessionManager {
 	 * so it is easier to find them.
 	 * These need to be appended via appendCompaction() and appendBranchSummary() methods.
 	 */
-	appendMessage(message: Message | CustomMessage | BashExecutionMessage): string {
+	async appendMessage(message: Message | CustomMessage | BashExecutionMessage): Promise<string> {
 		const entry: SessionMessageEntry = {
 			type: "message",
 			id: generateId(this.byId),
@@ -844,7 +900,7 @@ export class SessionManager {
 	}
 
 	/** Append a thinking level change as child of current leaf, then advance leaf. Returns entry id. */
-	appendThinkingLevelChange(thinkingLevel: string): string {
+	async appendThinkingLevelChange(thinkingLevel: string): Promise<string> {
 		const entry: ThinkingLevelChangeEntry = {
 			type: "thinking_level_change",
 			id: generateId(this.byId),
@@ -857,7 +913,7 @@ export class SessionManager {
 	}
 
 	/** Append a model change as child of current leaf, then advance leaf. Returns entry id. */
-	appendModelChange(provider: string, modelId: string): string {
+	async appendModelChange(provider: string, modelId: string): Promise<string> {
 		const entry: ModelChangeEntry = {
 			type: "model_change",
 			id: generateId(this.byId),
@@ -871,13 +927,13 @@ export class SessionManager {
 	}
 
 	/** Append a compaction summary as child of current leaf, then advance leaf. Returns entry id. */
-	appendCompaction<T = unknown>(
+	async appendCompaction<T = unknown>(
 		summary: string,
 		firstKeptEntryId: string,
 		tokensBefore: number,
 		details?: T,
 		fromHook?: boolean,
-	): string {
+	): Promise<string> {
 		const entry: CompactionEntry<T> = {
 			type: "compaction",
 			id: generateId(this.byId),
@@ -894,7 +950,7 @@ export class SessionManager {
 	}
 
 	/** Append a custom entry (for extensions) as child of current leaf, then advance leaf. Returns entry id. */
-	appendCustomEntry(customType: string, data?: unknown): string {
+	async appendCustomEntry(customType: string, data?: unknown): Promise<string> {
 		const entry: CustomEntry = {
 			type: "custom",
 			customType,
@@ -908,7 +964,7 @@ export class SessionManager {
 	}
 
 	/** Append a session info entry (e.g., display name). Returns entry id. */
-	appendSessionInfo(name: string): string {
+	async appendSessionInfo(name: string): Promise<string> {
 		const entry: SessionInfoEntry = {
 			type: "session_info",
 			id: generateId(this.byId),
@@ -942,12 +998,12 @@ export class SessionManager {
 	 * @param details Optional extension-specific metadata (not sent to LLM)
 	 * @returns Entry id
 	 */
-	appendCustomMessageEntry<T = unknown>(
+	async appendCustomMessageEntry<T = unknown>(
 		customType: string,
 		content: string | (TextContent | ImageContent)[],
 		display: boolean,
 		details?: T,
-	): string {
+	): Promise<string> {
 		const entry: CustomMessageEntry<T> = {
 			type: "custom_message",
 			customType,
@@ -1003,7 +1059,7 @@ export class SessionManager {
 	 * Labels are user-defined markers for bookmarking/navigation.
 	 * Pass undefined or empty string to clear the label.
 	 */
-	appendLabelChange(targetId: string, label: string | undefined): string {
+	async appendLabelChange(targetId: string, label: string | undefined): Promise<string> {
 		if (!this.byId.has(targetId)) {
 			throw new Error(`Entry ${targetId} not found`);
 		}
@@ -1122,7 +1178,7 @@ export class SessionManager {
 	 * will create a child of that entry, forming a new branch. Existing entries
 	 * are not modified or deleted.
 	 */
-	branch(branchFromId: string): void {
+	async branch(branchFromId: string): Promise<void> {
 		if (!this.byId.has(branchFromId)) {
 			throw new Error(`Entry ${branchFromId} not found`);
 		}
@@ -1134,7 +1190,7 @@ export class SessionManager {
 	 * The next appendXXX() call will create a new root entry (parentId = null).
 	 * Use this when navigating to re-edit the first user message.
 	 */
-	resetLeaf(): void {
+	async resetLeaf(): Promise<void> {
 		this.leafId = null;
 	}
 
@@ -1143,7 +1199,12 @@ export class SessionManager {
 	 * Same as branch(), but also appends a branch_summary entry that captures
 	 * context from the abandoned conversation path.
 	 */
-	branchWithSummary(branchFromId: string | null, summary: string, details?: unknown, fromHook?: boolean): string {
+	async branchWithSummary(
+		branchFromId: string | null,
+		summary: string,
+		details?: unknown,
+		fromHook?: boolean,
+	): Promise<string> {
 		if (branchFromId !== null && !this.byId.has(branchFromId)) {
 			throw new Error(`Entry ${branchFromId} not found`);
 		}
@@ -1167,7 +1228,7 @@ export class SessionManager {
 	 * Useful for extracting a single conversation path from a branched session.
 	 * Returns the new session file path, or undefined if not persisting.
 	 */
-	createBranchedSession(leafId: string): string | undefined {
+	async createBranchedSession(leafId: string): Promise<string | undefined> {
 		const previousSessionFile = this.sessionFile;
 		const path = this.getBranch(leafId);
 		if (path.length === 0) {
@@ -1266,9 +1327,9 @@ export class SessionManager {
 	 * @param cwd Working directory (stored in session header)
 	 * @param sessionDir Optional session directory. If omitted, uses default (~/.pi/agent/sessions/<encoded-cwd>/).
 	 */
-	static create(cwd: string, sessionDir?: string): SessionManager {
+	static create(cwd: string, sessionDir?: string): JsonlSessionManager {
 		const dir = sessionDir ?? getDefaultSessionDir(cwd);
-		return new SessionManager(cwd, dir, undefined, true);
+		return new JsonlSessionManager(cwd, dir, undefined, true);
 	}
 
 	/**
@@ -1277,14 +1338,14 @@ export class SessionManager {
 	 * @param sessionDir Optional session directory for /new or /branch. If omitted, derives from file's parent.
 	 * @param cwdOverride Optional cwd override instead of the session header cwd.
 	 */
-	static open(path: string, sessionDir?: string, cwdOverride?: string): SessionManager {
+	static open(path: string, sessionDir?: string, cwdOverride?: string): JsonlSessionManager {
 		// Extract cwd from session header if possible, otherwise use process.cwd()
 		const entries = loadEntriesFromFile(path);
 		const header = entries.find((e) => e.type === "session") as SessionHeader | undefined;
 		const cwd = cwdOverride ?? header?.cwd ?? process.cwd();
 		// If no sessionDir provided, derive from file's parent directory
 		const dir = sessionDir ?? resolve(path, "..");
-		return new SessionManager(cwd, dir, path, true);
+		return new JsonlSessionManager(cwd, dir, path, true);
 	}
 
 	/**
@@ -1292,18 +1353,18 @@ export class SessionManager {
 	 * @param cwd Working directory
 	 * @param sessionDir Optional session directory. If omitted, uses default (~/.pi/agent/sessions/<encoded-cwd>/).
 	 */
-	static continueRecent(cwd: string, sessionDir?: string): SessionManager {
+	static continueRecent(cwd: string, sessionDir?: string): JsonlSessionManager {
 		const dir = sessionDir ?? getDefaultSessionDir(cwd);
 		const mostRecent = findMostRecentSession(dir);
 		if (mostRecent) {
-			return new SessionManager(cwd, dir, mostRecent, true);
+			return new JsonlSessionManager(cwd, dir, mostRecent, true);
 		}
-		return new SessionManager(cwd, dir, undefined, true);
+		return new JsonlSessionManager(cwd, dir, undefined, true);
 	}
 
 	/** Create an in-memory session (no file persistence) */
-	static inMemory(cwd: string = process.cwd()): SessionManager {
-		return new SessionManager(cwd, "", undefined, false);
+	static inMemory(cwd: string = process.cwd()): JsonlSessionManager {
+		return new JsonlSessionManager(cwd, "", undefined, false);
 	}
 
 	/**
@@ -1313,7 +1374,7 @@ export class SessionManager {
 	 * @param targetCwd Target working directory (where the new session will be stored)
 	 * @param sessionDir Optional session directory. If omitted, uses default for targetCwd.
 	 */
-	static forkFrom(sourcePath: string, targetCwd: string, sessionDir?: string): SessionManager {
+	static forkFrom(sourcePath: string, targetCwd: string, sessionDir?: string): JsonlSessionManager {
 		const sourceEntries = loadEntriesFromFile(sourcePath);
 		if (sourceEntries.length === 0) {
 			throw new Error(`Cannot fork: source session file is empty or invalid: ${sourcePath}`);
@@ -1353,7 +1414,7 @@ export class SessionManager {
 			}
 		}
 
-		return new SessionManager(targetCwd, dir, newSessionFile, true);
+		return new JsonlSessionManager(targetCwd, dir, newSessionFile, true);
 	}
 
 	/**
@@ -1423,3 +1484,5 @@ export class SessionManager {
 		}
 	}
 }
+
+export const SessionManager = JsonlSessionManager;

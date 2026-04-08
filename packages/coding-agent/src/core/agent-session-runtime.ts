@@ -182,7 +182,7 @@ export class AgentSessionRuntime {
 		}
 
 		const previousSessionFile = this.session.sessionFile;
-		const sessionManager = SessionManager.open(sessionPath, undefined, options?.cwdOverride);
+		const sessionManager = await SessionManager.open(sessionPath, undefined, options?.cwdOverride);
 		assertSessionCwdExists(sessionManager, this.cwd);
 		await this.teardownCurrent("resume", sessionManager.getSessionFile());
 		this.apply(
@@ -209,9 +209,9 @@ export class AgentSessionRuntime {
 
 		const previousSessionFile = this.session.sessionFile;
 		const sessionDir = this.session.sessionManager.getSessionDir();
-		const sessionManager = SessionManager.create(this.cwd, sessionDir);
+		const sessionManager = await SessionManager.create(this.cwd, sessionDir);
 		if (options?.parentSession) {
-			sessionManager.newSession({ parentSession: options.parentSession });
+			await sessionManager.newSession({ parentSession: options.parentSession });
 		}
 
 		await this.teardownCurrent("new", sessionManager.getSessionFile());
@@ -266,8 +266,8 @@ export class AgentSessionRuntime {
 			}
 			const sessionDir = this.session.sessionManager.getSessionDir();
 			if (!targetLeafId) {
-				const sessionManager = SessionManager.create(this.cwd, sessionDir);
-				sessionManager.newSession({ parentSession: currentSessionFile });
+				const sessionManager = await SessionManager.create(this.cwd, sessionDir);
+				await sessionManager.newSession({ parentSession: currentSessionFile });
 				await this.teardownCurrent("fork", sessionManager.getSessionFile());
 				this.apply(
 					await this.createRuntime({
@@ -281,12 +281,12 @@ export class AgentSessionRuntime {
 				return { cancelled: false, selectedText };
 			}
 
-			const sourceManager = SessionManager.open(currentSessionFile, sessionDir);
-			const forkedSessionPath = sourceManager.createBranchedSession(targetLeafId);
+			const sourceManager = await SessionManager.open(currentSessionFile, sessionDir);
+			const forkedSessionPath = await sourceManager.createBranchedSession(targetLeafId);
 			if (!forkedSessionPath) {
 				throw new Error("Failed to create forked session");
 			}
-			const sessionManager = SessionManager.open(forkedSessionPath, sessionDir);
+			const sessionManager = await SessionManager.open(forkedSessionPath, sessionDir);
 			await this.teardownCurrent("fork", sessionManager.getSessionFile());
 			this.apply(
 				await this.createRuntime({
@@ -302,9 +302,9 @@ export class AgentSessionRuntime {
 
 		const sessionManager = this.session.sessionManager;
 		if (!targetLeafId) {
-			sessionManager.newSession({ parentSession: this.session.sessionFile });
+			await sessionManager.newSession({ parentSession: this.session.sessionFile });
 		} else {
-			sessionManager.createBranchedSession(targetLeafId);
+			await sessionManager.createBranchedSession(targetLeafId);
 		}
 		await this.teardownCurrent("fork", sessionManager.getSessionFile());
 		this.apply(
@@ -348,7 +348,7 @@ export class AgentSessionRuntime {
 			copyFileSync(resolvedPath, destinationPath);
 		}
 
-		const sessionManager = SessionManager.open(destinationPath, sessionDir, cwdOverride);
+		const sessionManager = await SessionManager.open(destinationPath, sessionDir, cwdOverride);
 		assertSessionCwdExists(sessionManager, this.cwd);
 		await this.teardownCurrent("resume", sessionManager.getSessionFile());
 		this.apply(

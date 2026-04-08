@@ -291,7 +291,7 @@ export async function exportFromFile(inputPath: string, options?: ExportOptions 
 		throw new Error(`File not found: ${inputPath}`);
 	}
 
-	const sm = SessionManager.open(inputPath);
+	const sm = await SessionManager.open(inputPath);
 
 	const sessionData: SessionData = {
 		header: sm.getHeader(),
