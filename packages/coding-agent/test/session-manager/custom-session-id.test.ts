@@ -46,15 +46,15 @@ describe("SessionManager.newSession with custom id", () => {
 		expect(session.getHeader()!.id).toBe(session.getSessionId());
 	});
 
-	it("generates a UUIDv7 id when creating a branched session", () => {
+	it("generates a UUIDv7 id when creating a branched session", async () => {
 		const session = SessionManager.inMemory();
-		const firstId = session.appendMessage({
+		const firstId = await session.appendMessage({
 			role: "user",
 			content: [{ type: "text", text: "hello" }],
 			timestamp: Date.now(),
 		});
 
-		session.createBranchedSession(firstId);
+		await session.createBranchedSession(firstId);
 
 		expect(session.getSessionId()).toMatch(UUID_V7_RE);
 		expect(session.getHeader()!.id).toBe(session.getSessionId());

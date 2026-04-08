@@ -525,7 +525,7 @@ export class AgentSession {
 			// Check if this is a custom message from extensions
 			if (event.message.role === "custom") {
 				// Persist as CustomMessageEntry
-				this.sessionManager.appendCustomMessageEntry(
+				await this.sessionManager.appendCustomMessageEntry(
 					event.message.customType,
 					event.message.content,
 					event.message.display,
@@ -537,7 +537,7 @@ export class AgentSession {
 				event.message.role === "toolResult"
 			) {
 				// Regular LLM message - persist as SessionMessageEntry
-				this.sessionManager.appendMessage(event.message);
+				await this.sessionManager.appendMessage(event.message);
 			}
 			// Other message types (bashExecution, compactionSummary, branchSummary) are persisted elsewhere
 
@@ -1270,7 +1270,7 @@ export class AgentSession {
 			await this.agent.prompt(appMessage);
 		} else {
 			this.agent.state.messages.push(appMessage);
-			this.sessionManager.appendCustomMessageEntry(
+			await this.sessionManager.appendCustomMessageEntry(
 				message.customType,
 				message.content,
 				message.display,
@@ -1395,7 +1395,7 @@ export class AgentSession {
 		const previousModel = this.model;
 		const thinkingLevel = this._getThinkingLevelForModelSwitch();
 		this.agent.state.model = model;
-		this.sessionManager.appendModelChange(model.provider, model.id);
+		await this.sessionManager.appendModelChange(model.provider, model.id);
 		this.settingsManager.setDefaultModelAndProvider(model.provider, model.id);
 
 		// Re-clamp thinking level for new model's capabilities
@@ -1432,7 +1432,7 @@ export class AgentSession {
 
 		// Apply model
 		this.agent.state.model = next.model;
-		this.sessionManager.appendModelChange(next.model.provider, next.model.id);
+		await this.sessionManager.appendModelChange(next.model.provider, next.model.id);
 		this.settingsManager.setDefaultModelAndProvider(next.model.provider, next.model.id);
 
 		// Apply thinking level.
@@ -1460,7 +1460,7 @@ export class AgentSession {
 
 		const thinkingLevel = this._getThinkingLevelForModelSwitch();
 		this.agent.state.model = nextModel;
-		this.sessionManager.appendModelChange(nextModel.provider, nextModel.id);
+		await this.sessionManager.appendModelChange(nextModel.provider, nextModel.id);
 		this.settingsManager.setDefaultModelAndProvider(nextModel.provider, nextModel.id);
 
 		// Re-clamp thinking level for new model's capabilities
@@ -1490,7 +1490,7 @@ export class AgentSession {
 		this.agent.state.thinkingLevel = effectiveLevel;
 
 		if (isChanging) {
-			this.sessionManager.appendThinkingLevelChange(effectiveLevel);
+			void this.sessionManager.appendThinkingLevelChange(effectiveLevel);
 			if (this.supportsThinking() || effectiveLevel !== "off") {
 				this.settingsManager.setDefaultThinkingLevel(effectiveLevel);
 			}
@@ -1675,7 +1675,7 @@ export class AgentSession {
 				throw new Error("Compaction cancelled");
 			}
 
-			this.sessionManager.appendCompaction(summary, firstKeptEntryId, tokensBefore, details, fromExtension);
+			await this.sessionManager.appendCompaction(summary, firstKeptEntryId, tokensBefore, details, fromExtension);
 			const newEntries = this.sessionManager.getEntries();
 			const sessionContext = this.sessionManager.buildSessionContext();
 			this.agent.state.messages = sessionContext.messages;
@@ -1947,7 +1947,7 @@ export class AgentSession {
 				return;
 			}
 
-			this.sessionManager.appendCompaction(summary, firstKeptEntryId, tokensBefore, details, fromExtension);
+			await this.sessionManager.appendCompaction(summary, firstKeptEntryId, tokensBefore, details, fromExtension);
 			const newEntries = this.sessionManager.getEntries();
 			const sessionContext = this.sessionManager.buildSessionContext();
 			this.agent.state.messages = sessionContext.messages;
@@ -2163,16 +2163,16 @@ export class AgentSession {
 					});
 				},
 				appendEntry: (customType, data) => {
-					this.sessionManager.appendCustomEntry(customType, data);
+					void this.sessionManager.appendCustomEntry(customType, data);
 				},
 				setSessionName: (name) => {
-					this.sessionManager.appendSessionInfo(name);
+					void this.sessionManager.appendSessionInfo(name);
 				},
 				getSessionName: () => {
 					return this.sessionManager.getSessionName();
 				},
 				setLabel: (entryId, label) => {
-					this.sessionManager.appendLabelChange(entryId, label);
+					void this.sessionManager.appendLabelChange(entryId, label);
 				},
 				getActiveTools: () => this.getActiveToolNames(),
 				getAllTools: () => this.getAllTools(),
@@ -2600,7 +2600,7 @@ export class AgentSession {
 			this.agent.state.messages.push(bashMessage);
 
 			// Save to session
-			this.sessionManager.appendMessage(bashMessage);
+			void this.sessionManager.appendMessage(bashMessage);
 		}
 	}
 
@@ -2633,7 +2633,7 @@ export class AgentSession {
 			this.agent.state.messages.push(bashMessage);
 
 			// Save to session
-			this.sessionManager.appendMessage(bashMessage);
+			void this.sessionManager.appendMessage(bashMessage);
 		}
 
 		this._pendingBashMessages = [];
@@ -2647,7 +2647,7 @@ export class AgentSession {
 	 * Set a display name for the current session.
 	 */
 	setSessionName(name: string): void {
-		this.sessionManager.appendSessionInfo(name);
+		void this.sessionManager.appendSessionInfo(name);
 	}
 
 	// =========================================================================
@@ -2804,24 +2804,29 @@ export class AgentSession {
 		let summaryEntry: BranchSummaryEntry | undefined;
 		if (summaryText) {
 			// Create summary at target position (can be null for root)
-			const summaryId = this.sessionManager.branchWithSummary(newLeafId, summaryText, summaryDetails, fromExtension);
+			const summaryId = await this.sessionManager.branchWithSummary(
+				newLeafId,
+				summaryText,
+				summaryDetails,
+				fromExtension,
+			);
 			summaryEntry = this.sessionManager.getEntry(summaryId) as BranchSummaryEntry;
 
 			// Attach label to the summary entry
 			if (label) {
-				this.sessionManager.appendLabelChange(summaryId, label);
+				await this.sessionManager.appendLabelChange(summaryId, label);
 			}
 		} else if (newLeafId === null) {
 			// No summary, navigating to root - reset leaf
-			this.sessionManager.resetLeaf();
+			await this.sessionManager.resetLeaf();
 		} else {
 			// No summary, navigating to non-root
-			this.sessionManager.branch(newLeafId);
+			await this.sessionManager.branch(newLeafId);
 		}
 
 		// Attach label to target entry when not summarizing (no summary entry to label)
 		if (label && !summaryText) {
-			this.sessionManager.appendLabelChange(targetId, label);
+			await this.sessionManager.appendLabelChange(targetId, label);
 		}
 
 		// Update agent state
