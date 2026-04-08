@@ -178,7 +178,8 @@ export async function createAgentSession(options: CreateAgentSessionOptions = {}
 	const modelRegistry = options.modelRegistry ?? ModelRegistry.create(authStorage, modelsPath);
 
 	const settingsManager = options.settingsManager ?? SettingsManager.create(cwd, agentDir);
-	const sessionManager = options.sessionManager ?? SessionManager.create(cwd, getDefaultSessionDir(cwd, agentDir));
+	const sessionManager =
+		options.sessionManager ?? (await SessionManager.create(cwd, getDefaultSessionDir(cwd, agentDir)));
 
 	if (!resourceLoader) {
 		resourceLoader = new DefaultResourceLoader({ cwd, agentDir, settingsManager });
@@ -331,14 +332,14 @@ export async function createAgentSession(options: CreateAgentSessionOptions = {}
 	if (hasExistingSession) {
 		agent.state.messages = existingSession.messages;
 		if (!hasThinkingEntry) {
-			sessionManager.appendThinkingLevelChange(thinkingLevel);
+			await sessionManager.appendThinkingLevelChange(thinkingLevel);
 		}
 	} else {
 		// Save initial model and thinking level for new sessions so they can be restored on resume
 		if (model) {
-			sessionManager.appendModelChange(model.provider, model.id);
+			await sessionManager.appendModelChange(model.provider, model.id);
 		}
-		sessionManager.appendThinkingLevelChange(thinkingLevel);
+		await sessionManager.appendThinkingLevelChange(thinkingLevel);
 	}
 
 	const session = new AgentSession({

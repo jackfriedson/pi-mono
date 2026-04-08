@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- SessionManager mutation APIs now return promises so SDK and runtime integrations can await session persistence when wiring custom backends such as Postgres.
+
 ## [0.65.2] - 2026-04-06
 
 ## [0.65.1] - 2026-04-05
