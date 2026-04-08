@@ -49,7 +49,6 @@
 	"dependencies": {
 		"@mariozechner/jiti": "^2.6.5",
 		"@mariozechner/pi-coding-agent": "^0.30.2",
-		"biome": "^0.3.3",
 		"get-east-asian-width": "^1.4.0"
 	},
 	"overrides": {
