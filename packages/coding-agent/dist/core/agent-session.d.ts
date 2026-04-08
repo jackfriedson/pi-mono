@@ -148,8 +148,6 @@ export declare class AgentSession {
     private _unsubscribeAgent?;
     private _eventListeners;
     private _agentEventQueue;
-    private _sessionMutationQueue;
-    private _sessionMutationError;
     /** Tracks pending steering messages for UI display. Removed when delivered. */
     private _steeringMessages;
     /** Tracks pending follow-up messages for UI display. Removed when delivered. */
@@ -206,8 +204,6 @@ export declare class AgentSession {
     private _lastAssistantMessage;
     /** Internal handler for agent events - shared by subscribe and reconnect */
     private _handleAgentEvent;
-    private _queueSessionMutation;
-    private _waitForSessionMutations;
     private _createRetryPromiseForAgentEnd;
     private _findLastAssistantInMessages;
     private _processAgentEvent;
@@ -405,12 +401,12 @@ export declare class AgentSession {
      * Clamps to model capabilities based on available thinking levels.
      * Saves to session and settings only if the level actually changes.
      */
-    setThinkingLevel(level: ThinkingLevel): void;
+    setThinkingLevel(level: ThinkingLevel): Promise<void>;
     /**
      * Cycle to next thinking level.
      * @returns New level, or undefined if model doesn't support thinking
      */
-    cycleThinkingLevel(): ThinkingLevel | undefined;
+    cycleThinkingLevel(): Promise<ThinkingLevel | undefined>;
     /**
      * Get available thinking levels for current model.
      * The provider will clamp to what the specific model supports internally.
@@ -505,7 +501,7 @@ export declare class AgentSession {
      */
     recordBashResult(command: string, result: BashResult, options?: {
         excludeFromContext?: boolean;
-    }): void;
+    }): Promise<void>;
     /**
      * Cancel running bash command.
      */
@@ -518,7 +514,7 @@ export declare class AgentSession {
     /**
      * Set a display name for the current session.
      */
-    setSessionName(name: string): void;
+    setSessionName(name: string): Promise<void>;
     /**
      * Navigate to a different node in the session tree.
      * Unlike fork() which creates a new session file, this stays in the same file.

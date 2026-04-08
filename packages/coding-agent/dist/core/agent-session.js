@@ -66,8 +66,6 @@ export class AgentSession {
     _unsubscribeAgent;
     _eventListeners = [];
     _agentEventQueue = Promise.resolve();
-    _sessionMutationQueue = Promise.resolve();
-    _sessionMutationError = undefined;
     /** Tracks pending steering messages for UI display. Removed when delivered. */
     _steeringMessages = [];
     /** Tracks pending follow-up messages for UI display. Removed when delivered. */
@@ -239,23 +237,6 @@ export class AgentSession {
         // Keep queue alive if an event handler fails
         this._agentEventQueue.catch(() => { });
     };
-    _queueSessionMutation(mutation) {
-        const runMutation = async () => {
-            if (this._sessionMutationError) {
-                throw this._sessionMutationError;
-            }
-            await mutation();
-        };
-        this._sessionMutationQueue = this._sessionMutationQueue.then(runMutation, runMutation).catch((error) => {
-            const err = error instanceof Error ? error : new Error(String(error));
-            this._sessionMutationError = this._sessionMutationError ?? err;
-            throw this._sessionMutationError;
-        });
-        this._sessionMutationQueue.catch(() => { });
-    }
-    async _waitForSessionMutations() {
-        await this._sessionMutationQueue;
-    }
     _createRetryPromiseForAgentEnd(event) {
         if (event.type !== "agent_end" || this._retryPromise) {
             return;
@@ -793,7 +774,6 @@ export class AgentSession {
         }
         await this.agent.prompt(messages);
         await this.waitForRetry();
-        await this._waitForSessionMutations();
     }
     /**
      * Try to execute an extension command. Returns true if command was found and executed.
@@ -1080,7 +1060,7 @@ export class AgentSession {
         await this.sessionManager.appendModelChange(model.provider, model.id);
         this.settingsManager.setDefaultModelAndProvider(model.provider, model.id);
         // Re-clamp thinking level for new model's capabilities
-        this.setThinkingLevel(thinkingLevel);
+        await this.setThinkingLevel(thinkingLevel);
         await this._emitModelSelect(model, previousModel, "set");
     }
     /**
@@ -1115,7 +1095,7 @@ export class AgentSession {
         // - Explicit scoped model thinking level overrides current session level
         // - Undefined scoped model thinking level inherits the current session preference
         // setThinkingLevel clamps to model capabilities.
-        this.setThinkingLevel(thinkingLevel);
+        await this.setThinkingLevel(thinkingLevel);
         await this._emitModelSelect(next.model, currentModel, "cycle");
         return { model: next.model, thinkingLevel: this.thinkingLevel, isScoped: true };
     }
@@ -1135,7 +1115,7 @@ export class AgentSession {
         await this.sessionManager.appendModelChange(nextModel.provider, nextModel.id);
         this.settingsManager.setDefaultModelAndProvider(nextModel.provider, nextModel.id);
         // Re-clamp thinking level for new model's capabilities
-        this.setThinkingLevel(thinkingLevel);
+        await this.setThinkingLevel(thinkingLevel);
         await this._emitModelSelect(nextModel, currentModel, "cycle");
         return { model: nextModel, thinkingLevel: this.thinkingLevel, isScoped: false };
     }
@@ -1147,14 +1127,14 @@ export class AgentSession {
      * Clamps to model capabilities based on available thinking levels.
      * Saves to session and settings only if the level actually changes.
      */
-    setThinkingLevel(level) {
+    async setThinkingLevel(level) {
         const availableLevels = this.getAvailableThinkingLevels();
         const effectiveLevel = availableLevels.includes(level) ? level : this._clampThinkingLevel(level, availableLevels);
         // Only persist if actually changing
         const isChanging = effectiveLevel !== this.agent.state.thinkingLevel;
         this.agent.state.thinkingLevel = effectiveLevel;
         if (isChanging) {
-            this._queueSessionMutation(() => this.sessionManager.appendThinkingLevelChange(effectiveLevel));
+            await this.sessionManager.appendThinkingLevelChange(effectiveLevel);
             if (this.supportsThinking() || effectiveLevel !== "off") {
                 this.settingsManager.setDefaultThinkingLevel(effectiveLevel);
             }
@@ -1164,14 +1144,14 @@ export class AgentSession {
      * Cycle to next thinking level.
      * @returns New level, or undefined if model doesn't support thinking
      */
-    cycleThinkingLevel() {
+    async cycleThinkingLevel() {
         if (!this.supportsThinking())
             return undefined;
         const levels = this.getAvailableThinkingLevels();
         const currentIndex = levels.indexOf(this.thinkingLevel);
         const nextIndex = (currentIndex + 1) % levels.length;
         const nextLevel = levels[nextIndex];
-        this.setThinkingLevel(nextLevel);
+        await this.setThinkingLevel(nextLevel);
         return nextLevel;
     }
     /**
@@ -1732,17 +1712,17 @@ export class AgentSession {
                     });
                 });
             },
-            appendEntry: (customType, data) => {
-                this._queueSessionMutation(() => this.sessionManager.appendCustomEntry(customType, data));
+            appendEntry: async (customType, data) => {
+                await this.sessionManager.appendCustomEntry(customType, data);
             },
-            setSessionName: (name) => {
-                this._queueSessionMutation(() => this.sessionManager.appendSessionInfo(name));
+            setSessionName: async (name) => {
+                await this.sessionManager.appendSessionInfo(name);
             },
             getSessionName: () => {
                 return this.sessionManager.getSessionName();
             },
-            setLabel: (entryId, label) => {
-                this._queueSessionMutation(() => this.sessionManager.appendLabelChange(entryId, label));
+            setLabel: async (entryId, label) => {
+                await this.sessionManager.appendLabelChange(entryId, label);
             },
             getActiveTools: () => this.getActiveToolNames(),
             getAllTools: () => this.getAllTools(),
@@ -1756,7 +1736,7 @@ export class AgentSession {
                 return true;
             },
             getThinkingLevel: () => this.thinkingLevel,
-            setThinkingLevel: (level) => this.setThinkingLevel(level),
+            setThinkingLevel: async (level) => await this.setThinkingLevel(level),
         }, {
             getModel: () => this.model,
             isIdle: () => !this.isStreaming,
@@ -2060,8 +2040,7 @@ export class AgentSession {
                 onChunk,
                 signal: this._bashAbortController.signal,
             });
-            this.recordBashResult(command, result, options);
-            await this._waitForSessionMutations();
+            await this.recordBashResult(command, result, options);
             return result;
         }
         finally {
@@ -2072,7 +2051,7 @@ export class AgentSession {
      * Record a bash execution result in session history.
      * Used by executeBash and by extensions that handle bash execution themselves.
      */
-    recordBashResult(command, result, options) {
+    async recordBashResult(command, result, options) {
         const bashMessage = {
             role: "bashExecution",
             command,
@@ -2093,7 +2072,7 @@ export class AgentSession {
             // Add to agent state immediately
             this.agent.state.messages.push(bashMessage);
             // Save to session
-            this._queueSessionMutation(() => this.sessionManager.appendMessage(bashMessage));
+            await this.sessionManager.appendMessage(bashMessage);
         }
     }
     /**
@@ -2131,8 +2110,8 @@ export class AgentSession {
     /**
      * Set a display name for the current session.
      */
-    setSessionName(name) {
-        this._queueSessionMutation(() => this.sessionManager.appendSessionInfo(name));
+    async setSessionName(name) {
+        await this.sessionManager.appendSessionInfo(name);
     }
     // =========================================================================
     // Tree Navigation

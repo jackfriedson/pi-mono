@@ -127,7 +127,7 @@ export default function presetExtension(pi: ExtensionAPI) {
 
 		// Apply thinking level if specified
 		if (preset.thinkingLevel) {
-			pi.setThinkingLevel(preset.thinkingLevel);
+			await pi.setThinkingLevel(preset.thinkingLevel);
 		}
 
 		// Apply tools if specified
@@ -391,7 +391,7 @@ export default function presetExtension(pi: ExtensionAPI) {
 	// Persist preset state
 	pi.on("turn_start", async () => {
 		if (activePresetName) {
-			pi.appendEntry("preset-state", { name: activePresetName });
+			await pi.appendEntry("preset-state", { name: activePresetName });
 		}
 	});
 }
