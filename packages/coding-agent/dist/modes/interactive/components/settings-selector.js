@@ -113,6 +113,13 @@ export class SettingsSelectorComponent extends Container {
                 values: ["true", "false"],
             },
             {
+                id: "install-telemetry",
+                label: "Install telemetry",
+                description: "Send an anonymous version/update ping after changelog-detected updates",
+                currentValue: config.enableInstallTelemetry ? "true" : "false",
+                values: ["true", "false"],
+            },
+            {
                 id: "double-escape-action",
                 label: "Double-escape action",
                 description: "Action when pressing Escape twice with empty editor",
@@ -270,6 +277,9 @@ export class SettingsSelectorComponent extends Container {
                     break;
                 case "quiet-startup":
                     callbacks.onQuietStartupChange(newValue === "true");
+                    break;
+                case "install-telemetry":
+                    callbacks.onEnableInstallTelemetryChange(newValue === "true");
                     break;
                 case "double-escape-action":
                     callbacks.onDoubleEscapeActionChange(newValue);

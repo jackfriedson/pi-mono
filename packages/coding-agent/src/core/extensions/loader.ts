@@ -135,6 +135,9 @@ export function createExtensionRuntime(): ExtensionRuntime {
 	const notInitialized = () => {
 		throw new Error("Extension runtime not initialized. Action methods cannot be called during extension loading.");
 	};
+	const notInitializedAsync = async () => {
+		throw new Error("Extension runtime not initialized. Action methods cannot be called during extension loading.");
+	};
 	const state: { staleMessage?: string } = {};
 	const assertActive = () => {
 		if (state.staleMessage) {
@@ -145,10 +148,10 @@ export function createExtensionRuntime(): ExtensionRuntime {
 	const runtime: ExtensionRuntime = {
 		sendMessage: notInitialized,
 		sendUserMessage: notInitialized,
-		appendEntry: notInitialized,
-		setSessionName: notInitialized,
+		appendEntry: notInitializedAsync,
+		setSessionName: notInitializedAsync,
 		getSessionName: notInitialized,
-		setLabel: notInitialized,
+		setLabel: notInitializedAsync,
 		getActiveTools: notInitialized,
 		getAllTools: notInitialized,
 		setActiveTools: notInitialized,
@@ -157,7 +160,7 @@ export function createExtensionRuntime(): ExtensionRuntime {
 		getCommands: notInitialized,
 		setModel: () => Promise.reject(new Error("Extension runtime not initialized")),
 		getThinkingLevel: notInitialized,
-		setThinkingLevel: notInitialized,
+		setThinkingLevel: notInitializedAsync,
 		flagValues: new Map(),
 		pendingProviderRegistrations: [],
 		assertActive,
@@ -262,14 +265,14 @@ function createExtensionAPI(
 			runtime.sendUserMessage(content, options);
 		},
 
-		appendEntry(customType: string, data?: unknown): void {
+		async appendEntry(customType: string, data?: unknown): Promise<void> {
 			runtime.assertActive();
-			runtime.appendEntry(customType, data);
+			await runtime.appendEntry(customType, data);
 		},
 
-		setSessionName(name: string): void {
+		async setSessionName(name: string): Promise<void> {
 			runtime.assertActive();
-			runtime.setSessionName(name);
+			await runtime.setSessionName(name);
 		},
 
 		getSessionName(): string | undefined {
@@ -277,9 +280,9 @@ function createExtensionAPI(
 			return runtime.getSessionName();
 		},
 
-		setLabel(entryId: string, label: string | undefined): void {
+		async setLabel(entryId: string, label: string | undefined): Promise<void> {
 			runtime.assertActive();
-			runtime.setLabel(entryId, label);
+			await runtime.setLabel(entryId, label);
 		},
 
 		exec(command: string, args: string[], options?: ExecOptions) {
@@ -317,9 +320,9 @@ function createExtensionAPI(
 			return runtime.getThinkingLevel();
 		},
 
-		setThinkingLevel(level) {
+		async setThinkingLevel(level) {
 			runtime.assertActive();
-			runtime.setThinkingLevel(level);
+			await runtime.setThinkingLevel(level);
 		},
 
 		registerProvider(name: string, config: ProviderConfig) {

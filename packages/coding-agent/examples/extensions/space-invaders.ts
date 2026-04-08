@@ -549,8 +549,8 @@ export default function (pi: ExtensionAPI) {
 				return new SpaceInvadersComponent(
 					tui,
 					() => done(undefined),
-					(state) => {
-						pi.appendEntry(INVADERS_SAVE_TYPE, state);
+					async (state) => {
+						await pi.appendEntry(INVADERS_SAVE_TYPE, state);
 					},
 					savedState,
 				);

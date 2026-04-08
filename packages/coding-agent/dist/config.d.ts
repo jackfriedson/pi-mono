@@ -39,6 +39,15 @@ export declare function getDocsPath(): string;
 export declare function getExamplesPath(): string;
 /** Get path to CHANGELOG.md */
 export declare function getChangelogPath(): string;
+/**
+ * Get path to built-in interactive assets directory.
+ * - For Bun binary: assets/ next to executable
+ * - For Node.js (dist/): dist/modes/interactive/assets/
+ * - For tsx (src/): src/modes/interactive/assets/
+ */
+export declare function getInteractiveAssetsDir(): string;
+/** Get path to a bundled interactive asset */
+export declare function getBundledInteractiveAssetPath(name: string): string;
 export declare const APP_NAME: string;
 export declare const CONFIG_DIR_NAME: string;
 export declare const VERSION: string;

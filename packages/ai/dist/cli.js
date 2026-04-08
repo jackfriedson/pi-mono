@@ -1,6 +1,6 @@
 #!/usr/bin/env node
+import { createInterface } from "node:readline";
 import { existsSync, readFileSync, writeFileSync } from "fs";
-import { createInterface } from "readline";
 import { getOAuthProvider, getOAuthProviders } from "./utils/oauth/index.js";
 const AUTH_FILE = "auth.json";
 const PROVIDERS = getOAuthProviders();

@@ -331,9 +331,9 @@ export default function (pi: ExtensionAPI) {
 				return new SnakeComponent(
 					tui,
 					() => done(undefined),
-					(state) => {
+					async (state) => {
 						// Save or clear state
-						pi.appendEntry(SNAKE_SAVE_TYPE, state);
+						await pi.appendEntry(SNAKE_SAVE_TYPE, state);
 					},
 					savedState,
 				);

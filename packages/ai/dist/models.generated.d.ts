@@ -4506,6 +4506,26 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
+        readonly "MiniMaxAI/MiniMax-M2.7": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                supportsDeveloperRole: false;
+            };
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
         readonly "Qwen/Qwen3-235B-A22B-Thinking-2507": {
             id: string;
             name: string;
@@ -6781,23 +6801,6 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
-        readonly "qwen3.6-plus-free": {
-            id: string;
-            name: string;
-            api: "openai-completions";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
-            input: "text"[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
     };
     readonly "opencode-go": {
         readonly "glm-5": {
@@ -7313,23 +7316,6 @@ export declare const MODELS: {
             maxTokens: number;
         };
         readonly "arcee-ai/trinity-mini": {
-            id: string;
-            name: string;
-            api: "openai-completions";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
-            input: "text"[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "arcee-ai/trinity-mini:free": {
             id: string;
             name: string;
             api: "openai-completions";
@@ -7993,23 +7979,6 @@ export declare const MODELS: {
             maxTokens: number;
         };
         readonly "kwaipilot/kat-coder-pro-v2": {
-            id: string;
-            name: string;
-            api: "openai-completions";
-            provider: string;
-            baseUrl: string;
-            reasoning: false;
-            input: "text"[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "meituan/longcat-flash-chat": {
             id: string;
             name: string;
             api: "openai-completions";
@@ -9845,6 +9814,23 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
+        readonly "openrouter/elephant-alpha": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: false;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
         readonly "openrouter/free": {
             id: string;
             name: string;
@@ -10696,23 +10682,6 @@ export declare const MODELS: {
             maxTokens: number;
         };
         readonly "stepfun/step-3.5-flash": {
-            id: string;
-            name: string;
-            api: "openai-completions";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
-            input: "text"[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "stepfun/step-3.5-flash:free": {
             id: string;
             name: string;
             api: "openai-completions";
@@ -13289,23 +13258,6 @@ export declare const MODELS: {
             baseUrl: string;
             reasoning: true;
             input: "text"[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "xai/grok-2-vision": {
-            id: string;
-            name: string;
-            api: "anthropic-messages";
-            provider: string;
-            baseUrl: string;
-            reasoning: false;
-            input: ("image" | "text")[];
             cost: {
                 input: number;
                 output: number;

@@ -401,12 +401,12 @@ export declare class AgentSession {
      * Clamps to model capabilities based on available thinking levels.
      * Saves to session and settings only if the level actually changes.
      */
-    setThinkingLevel(level: ThinkingLevel): void;
+    setThinkingLevel(level: ThinkingLevel): Promise<void>;
     /**
      * Cycle to next thinking level.
      * @returns New level, or undefined if model doesn't support thinking
      */
-    cycleThinkingLevel(): ThinkingLevel | undefined;
+    cycleThinkingLevel(): Promise<ThinkingLevel | undefined>;
     /**
      * Get available thinking levels for current model.
      * The provider will clamp to what the specific model supports internally.
@@ -501,7 +501,7 @@ export declare class AgentSession {
      */
     recordBashResult(command: string, result: BashResult, options?: {
         excludeFromContext?: boolean;
-    }): void;
+    }): Promise<void>;
     /**
      * Cancel running bash command.
      */
@@ -510,15 +510,11 @@ export declare class AgentSession {
     get isBashRunning(): boolean;
     /** Whether there are pending bash messages waiting to be flushed */
     get hasPendingBashMessages(): boolean;
-    /**
-     * Flush pending bash messages to agent state and session.
-     * Called after agent turn completes to maintain proper message ordering.
-     */
     private _flushPendingBashMessages;
     /**
      * Set a display name for the current session.
      */
-    setSessionName(name: string): void;
+    setSessionName(name: string): Promise<void>;
     /**
      * Navigate to a different node in the session tree.
      * Unlike fork() which creates a new session file, this stays in the same file.

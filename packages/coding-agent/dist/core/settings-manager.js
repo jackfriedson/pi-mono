@@ -517,6 +517,14 @@ export class SettingsManager {
         this.markModified("collapseChangelog");
         this.save();
     }
+    getEnableInstallTelemetry() {
+        return this.settings.enableInstallTelemetry ?? true;
+    }
+    setEnableInstallTelemetry(enabled) {
+        this.globalSettings.enableInstallTelemetry = enabled;
+        this.markModified("enableInstallTelemetry");
+        this.save();
+    }
     getPackages() {
         return [...(this.settings.packages ?? [])];
     }

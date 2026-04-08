@@ -93,13 +93,16 @@ export function createExtensionRuntime() {
     const notInitialized = () => {
         throw new Error("Extension runtime not initialized. Action methods cannot be called during extension loading.");
     };
+    const notInitializedAsync = async () => {
+        throw new Error("Extension runtime not initialized. Action methods cannot be called during extension loading.");
+    };
     const runtime = {
         sendMessage: notInitialized,
         sendUserMessage: notInitialized,
-        appendEntry: notInitialized,
-        setSessionName: notInitialized,
+        appendEntry: notInitializedAsync,
+        setSessionName: notInitializedAsync,
         getSessionName: notInitialized,
-        setLabel: notInitialized,
+        setLabel: notInitializedAsync,
         getActiveTools: notInitialized,
         getAllTools: notInitialized,
         setActiveTools: notInitialized,
@@ -108,7 +111,7 @@ export function createExtensionRuntime() {
         getCommands: notInitialized,
         setModel: () => Promise.reject(new Error("Extension runtime not initialized")),
         getThinkingLevel: notInitialized,
-        setThinkingLevel: notInitialized,
+        setThinkingLevel: notInitializedAsync,
         flagValues: new Map(),
         pendingProviderRegistrations: [],
         // Pre-bind: queue registrations so bindCore() can flush them once the
@@ -174,17 +177,17 @@ function createExtensionAPI(extension, runtime, cwd, eventBus) {
         sendUserMessage(content, options) {
             runtime.sendUserMessage(content, options);
         },
-        appendEntry(customType, data) {
-            runtime.appendEntry(customType, data);
+        async appendEntry(customType, data) {
+            await runtime.appendEntry(customType, data);
         },
-        setSessionName(name) {
-            runtime.setSessionName(name);
+        async setSessionName(name) {
+            await runtime.setSessionName(name);
         },
         getSessionName() {
             return runtime.getSessionName();
         },
-        setLabel(entryId, label) {
-            runtime.setLabel(entryId, label);
+        async setLabel(entryId, label) {
+            await runtime.setLabel(entryId, label);
         },
         exec(command, args, options) {
             return execCommand(command, args, options?.cwd ?? cwd, options);
@@ -207,8 +210,8 @@ function createExtensionAPI(extension, runtime, cwd, eventBus) {
         getThinkingLevel() {
             return runtime.getThinkingLevel();
         },
-        setThinkingLevel(level) {
-            runtime.setThinkingLevel(level);
+        async setThinkingLevel(level) {
+            await runtime.setThinkingLevel(level);
         },
         registerProvider(name, config) {
             runtime.registerProvider(name, config, extension.path);

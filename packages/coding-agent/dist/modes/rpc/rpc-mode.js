@@ -344,11 +344,11 @@ export async function runRpcMode(runtimeHost) {
             // Thinking
             // =================================================================
             case "set_thinking_level": {
-                session.setThinkingLevel(command.level);
+                await session.setThinkingLevel(command.level);
                 return success(id, "set_thinking_level");
             }
             case "cycle_thinking_level": {
-                const level = session.cycleThinkingLevel();
+                const level = await session.cycleThinkingLevel();
                 if (!level) {
                     return success(id, "cycle_thinking_level", null);
                 }
@@ -436,7 +436,7 @@ export async function runRpcMode(runtimeHost) {
                 if (!name) {
                     return error(id, "set_session_name", "Session name cannot be empty");
                 }
-                session.setSessionName(name);
+                await session.setSessionName(name);
                 return success(id, "set_session_name");
             }
             // =================================================================
