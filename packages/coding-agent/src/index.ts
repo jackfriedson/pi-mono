@@ -1,5 +1,7 @@
 // Core session management
 
+export type { AgentMessage } from "@earendil-works/pi-agent-core";
+export type { ImageContent, Message, TextContent } from "@earendil-works/pi-ai";
 // Config paths
 export { getAgentDir, VERSION } from "./config.ts";
 export {
@@ -147,6 +149,7 @@ export {
 } from "./core/extensions/index.ts";
 // Footer data provider (git branch + extension statuses - data not otherwise available to extensions)
 export type { ReadonlyFooterDataProvider } from "./core/footer-data-provider.ts";
+export type { BashExecutionMessage, CustomMessage } from "./core/messages.ts";
 export { convertToLlm } from "./core/messages.ts";
 export { ModelRegistry } from "./core/model-registry.ts";
 export type {
@@ -197,18 +200,23 @@ export {
 	type CustomMessageEntry,
 	type FileEntry,
 	getLatestCompactionEntry,
+	type JsonlSessionManager,
+	type LabelEntry,
 	type ModelChangeEntry,
 	migrateSessionEntries,
 	type NewSessionOptions,
 	parseSessionEntries,
+	type ReadonlySessionManager,
 	type SessionContext,
 	type SessionEntry,
 	type SessionEntryBase,
 	type SessionHeader,
 	type SessionInfo,
 	type SessionInfoEntry,
+	type SessionListProgress,
 	SessionManager,
 	type SessionMessageEntry,
+	type SessionTreeNode,
 	type ThinkingLevelChangeEntry,
 } from "./core/session-manager.ts";
 export {
