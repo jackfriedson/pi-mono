@@ -758,13 +758,13 @@ export interface ExtensionAPI {
         deliverAs?: "steer" | "followUp";
     }): void;
     /** Append a custom entry to the session for state persistence (not sent to LLM). */
-    appendEntry<T = unknown>(customType: string, data?: T): void;
+    appendEntry<T = unknown>(customType: string, data?: T): Promise<void>;
     /** Set the session display name (shown in session selector). */
-    setSessionName(name: string): void;
+    setSessionName(name: string): Promise<void>;
     /** Get the current session name, if set. */
     getSessionName(): string | undefined;
     /** Set or clear a label on an entry. Labels are user-defined markers for bookmarking/navigation. */
-    setLabel(entryId: string, label: string | undefined): void;
+    setLabel(entryId: string, label: string | undefined): Promise<void>;
     /** Execute a shell command. */
     exec(command: string, args: string[], options?: ExecOptions): Promise<ExecResult>;
     /** Get the list of currently active tool names. */
@@ -780,7 +780,7 @@ export interface ExtensionAPI {
     /** Get current thinking level. */
     getThinkingLevel(): ThinkingLevel;
     /** Set thinking level (clamped to model capabilities). */
-    setThinkingLevel(level: ThinkingLevel): void;
+    setThinkingLevel(level: ThinkingLevel): Promise<void>;
     /**
      * Register or override a model provider.
      *
@@ -936,8 +936,8 @@ export type SendMessageHandler = <T = unknown>(message: Pick<CustomMessage<T>, "
 export type SendUserMessageHandler = (content: string | (TextContent | ImageContent)[], options?: {
     deliverAs?: "steer" | "followUp";
 }) => void;
-export type AppendEntryHandler = <T = unknown>(customType: string, data?: T) => void;
-export type SetSessionNameHandler = (name: string) => void;
+export type AppendEntryHandler = <T = unknown>(customType: string, data?: T) => Promise<void>;
+export type SetSessionNameHandler = (name: string) => Promise<void>;
 export type GetSessionNameHandler = () => string | undefined;
 export type GetActiveToolsHandler = () => string[];
 /** Tool info with name, description, parameter schema, and source metadata */
@@ -950,8 +950,8 @@ export type SetActiveToolsHandler = (toolNames: string[]) => void;
 export type RefreshToolsHandler = () => void;
 export type SetModelHandler = (model: Model<any>) => Promise<boolean>;
 export type GetThinkingLevelHandler = () => ThinkingLevel;
-export type SetThinkingLevelHandler = (level: ThinkingLevel) => void;
-export type SetLabelHandler = (entryId: string, label: string | undefined) => void;
+export type SetThinkingLevelHandler = (level: ThinkingLevel) => Promise<void>;
+export type SetLabelHandler = (entryId: string, label: string | undefined) => Promise<void>;
 /**
  * Shared state created by loader, used during registration and runtime.
  * Contains flag values (defaults set during registration, CLI values set after).
