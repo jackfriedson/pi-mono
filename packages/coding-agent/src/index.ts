@@ -1,5 +1,7 @@
 // Core session management
 
+export type { AgentMessage } from "@mariozechner/pi-agent-core";
+export type { ImageContent, Message, TextContent } from "@mariozechner/pi-ai";
 // Config paths
 export { getAgentDir, VERSION } from "./config.js";
 export {
@@ -141,6 +143,7 @@ export {
 } from "./core/extensions/index.js";
 // Footer data provider (git branch + extension statuses - data not otherwise available to extensions)
 export type { ReadonlyFooterDataProvider } from "./core/footer-data-provider.js";
+export type { BashExecutionMessage, CustomMessage } from "./core/messages.js";
 export { convertToLlm } from "./core/messages.js";
 export { ModelRegistry } from "./core/model-registry.js";
 export type {
@@ -193,18 +196,23 @@ export {
 	type CustomMessageEntry,
 	type FileEntry,
 	getLatestCompactionEntry,
+	type JsonlSessionManager,
+	type LabelEntry,
 	type ModelChangeEntry,
 	migrateSessionEntries,
 	type NewSessionOptions,
 	parseSessionEntries,
+	type ReadonlySessionManager,
 	type SessionContext,
 	type SessionEntry,
 	type SessionEntryBase,
 	type SessionHeader,
 	type SessionInfo,
 	type SessionInfoEntry,
+	type SessionListProgress,
 	SessionManager,
 	type SessionMessageEntry,
+	type SessionTreeNode,
 	type ThinkingLevelChangeEntry,
 } from "./core/session-manager.js";
 export {
