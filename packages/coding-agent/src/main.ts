@@ -237,9 +237,14 @@ function validateSessionIdFlags(parsed: Args): void {
 	}
 }
 
-function forkSessionOrExit(sourcePath: string, cwd: string, sessionDir?: string, sessionId?: string): SessionManager {
+async function forkSessionOrExit(
+	sourcePath: string,
+	cwd: string,
+	sessionDir?: string,
+	sessionId?: string,
+): Promise<SessionManager> {
 	try {
-		return SessionManager.forkFrom(sourcePath, cwd, sessionDir, { id: sessionId });
+		return await SessionManager.forkFrom(sourcePath, cwd, sessionDir, { id: sessionId });
 	} catch (error: unknown) {
 		const message = error instanceof Error ? error.message : String(error);
 		console.error(chalk.red(`Error: ${message}`));
@@ -254,7 +259,7 @@ async function createSessionManager(
 	settingsManager: SettingsManager,
 ): Promise<SessionManager> {
 	if (parsed.noSession || parsed.help || parsed.listModels !== undefined) {
-		return SessionManager.inMemory(cwd);
+		return await SessionManager.inMemory(cwd);
 	}
 
 	if (parsed.fork) {
@@ -272,7 +277,7 @@ async function createSessionManager(
 			case "path":
 			case "local":
 			case "global":
-				return forkSessionOrExit(resolved.path, cwd, sessionDir, parsed.sessionId);
+				return await forkSessionOrExit(resolved.path, cwd, sessionDir, parsed.sessionId);
 
 			case "not_found":
 				console.error(chalk.red(`No session found matching '${resolved.arg}'`));
@@ -286,7 +291,7 @@ async function createSessionManager(
 		switch (resolved.type) {
 			case "path":
 			case "local":
-				return SessionManager.open(resolved.path, sessionDir);
+				return await SessionManager.open(resolved.path, sessionDir);
 
 			case "global": {
 				console.log(chalk.yellow(`Session found in different project: ${resolved.cwd}`));
@@ -295,7 +300,7 @@ async function createSessionManager(
 					console.log(chalk.dim("Aborted."));
 					process.exit(0);
 				}
-				return forkSessionOrExit(resolved.path, cwd, sessionDir);
+				return await forkSessionOrExit(resolved.path, cwd, sessionDir);
 			}
 
 			case "not_found":
@@ -315,24 +320,24 @@ async function createSessionManager(
 				console.log(chalk.dim("No session selected"));
 				process.exit(0);
 			}
-			return SessionManager.open(selectedPath, sessionDir);
+			return await SessionManager.open(selectedPath, sessionDir);
 		} finally {
 			stopThemeWatcher();
 		}
 	}
 
 	if (parsed.continue) {
-		return SessionManager.continueRecent(cwd, sessionDir);
+		return await SessionManager.continueRecent(cwd, sessionDir);
 	}
 
 	if (parsed.sessionId) {
 		const existingSession = await findLocalSessionByExactId(parsed.sessionId, cwd, sessionDir);
 		if (existingSession) {
-			return SessionManager.open(existingSession.path, sessionDir);
+			return await SessionManager.open(existingSession.path, sessionDir);
 		}
 	}
 
-	return SessionManager.create(cwd, sessionDir, { id: parsed.sessionId });
+	return await SessionManager.create(cwd, sessionDir, { id: parsed.sessionId });
 }
 
 function buildSessionOptions(
@@ -565,7 +570,7 @@ export async function main(args: string[], options?: MainOptions) {
 			if (!selectedCwd) {
 				process.exit(0);
 			}
-			sessionManager = SessionManager.open(missingSessionCwdIssue.sessionFile!, sessionDir, selectedCwd);
+			sessionManager = await SessionManager.open(missingSessionCwdIssue.sessionFile!, sessionDir, selectedCwd);
 		} else {
 			console.error(chalk.red(new MissingSessionCwdError(missingSessionCwdIssue).message));
 			process.exit(1);

@@ -19,12 +19,12 @@ describe("SessionManager.newSession with custom id", () => {
 		expect(session.getSessionId()).toBe("abc-123_def.456");
 	});
 
-	it("rejects invalid custom session ids", () => {
+	it("rejects invalid custom session ids", async () => {
 		const invalidIds = ["", "-abc", "abc-", "_abc", "abc_", ".abc", "abc.", "abc/def", "abc\\def", "abc def"];
 
 		for (const id of invalidIds) {
 			const session = SessionManager.inMemory();
-			expect(() => session.newSession({ id })).toThrow(
+			await expect(session.newSession({ id })).rejects.toThrow(
 				"Session id must be non-empty, contain only alphanumeric characters",
 			);
 		}
@@ -75,15 +75,15 @@ describe("SessionManager.newSession with custom id", () => {
 		expect(existsSync(sessionFile)).toBe(false);
 	});
 
-	it("generates a UUIDv7 id when creating a branched session", () => {
+	it("generates a UUIDv7 id when creating a branched session", async () => {
 		const session = SessionManager.inMemory();
-		const firstId = session.appendMessage({
+		const firstId = await session.appendMessage({
 			role: "user",
 			content: [{ type: "text", text: "hello" }],
 			timestamp: Date.now(),
 		});
 
-		session.createBranchedSession(firstId);
+		await session.createBranchedSession(firstId);
 
 		expect(session.getSessionId()).toMatch(UUID_V7_RE);
 		expect(session.getHeader()!.id).toBe(session.getSessionId());
