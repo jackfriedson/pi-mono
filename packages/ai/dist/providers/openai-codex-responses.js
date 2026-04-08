@@ -166,7 +166,7 @@ export const streamOpenAICodexResponses = (model, context, options) => {
                 throw new Error("No response body");
             }
             stream.push({ type: "start", partial: output });
-            await processStream(response, output, stream, model);
+            await processStream(response, output, stream, model, options);
             if (options?.signal?.aborted) {
                 throw new Error("Request was aborted");
             }
@@ -216,6 +216,9 @@ function buildRequestBody(model, context, options) {
     if (options?.temperature !== undefined) {
         body.temperature = options.temperature;
     }
+    if (options?.serviceTier !== undefined) {
+        body.service_tier = options.serviceTier;
+    }
     if (context.tools) {
         body.tools = convertResponsesTools(context.tools, { strict: null });
     }
@@ -237,6 +240,26 @@ function clampReasoningEffort(modelId, effort) {
         return effort === "high" || effort === "xhigh" ? "high" : "medium";
     return effort;
 }
+function getServiceTierCostMultiplier(serviceTier) {
+    switch (serviceTier) {
+        case "flex":
+            return 0.5;
+        case "priority":
+            return 2;
+        default:
+            return 1;
+    }
+}
+function applyServiceTierPricing(usage, serviceTier) {
+    const multiplier = getServiceTierCostMultiplier(serviceTier);
+    if (multiplier === 1)
+        return;
+    usage.cost.input *= multiplier;
+    usage.cost.output *= multiplier;
+    usage.cost.cacheRead *= multiplier;
+    usage.cost.cacheWrite *= multiplier;
+    usage.cost.total = usage.cost.input + usage.cost.output + usage.cost.cacheRead + usage.cost.cacheWrite;
+}
 function resolveCodexUrl(baseUrl) {
     const raw = baseUrl && baseUrl.trim().length > 0 ? baseUrl : DEFAULT_CODEX_BASE_URL;
     const normalized = raw.replace(/\/+$/, "");
@@ -257,8 +280,11 @@ function resolveCodexWebSocketUrl(baseUrl) {
 // ============================================================================
 // Response Processing
 // ============================================================================
-async function processStream(response, output, stream, model) {
-    await processResponsesStream(mapCodexEvents(parseSSE(response)), output, stream, model);
+async function processStream(response, output, stream, model, options) {
+    await processResponsesStream(mapCodexEvents(parseSSE(response)), output, stream, model, {
+        serviceTier: options?.serviceTier,
+        applyServiceTierPricing,
+    });
 }
 async function* mapCodexEvents(events) {
     for await (const event of events) {
@@ -642,7 +668,10 @@ async function processWebSocketStream(url, body, headers, output, stream, model,
         socket.send(JSON.stringify({ type: "response.create", ...body }));
         onStart();
         stream.push({ type: "start", partial: output });
-        await processResponsesStream(mapCodexEvents(parseWebSocket(socket, options?.signal)), output, stream, model);
+        await processResponsesStream(mapCodexEvents(parseWebSocket(socket, options?.signal)), output, stream, model, {
+            serviceTier: options?.serviceTier,
+            applyServiceTierPricing,
+        });
         if (options?.signal?.aborted) {
             keepConnection = false;
         }

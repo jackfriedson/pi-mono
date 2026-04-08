@@ -541,7 +541,7 @@ describe("AgentSessionRuntime characterization", () => {
 			await otherRuntime.dispose();
 		});
 		await otherRuntime.session.setModel(faux.getModel("faux-2")!);
-		otherRuntime.session.setThinkingLevel("off");
+		await otherRuntime.session.setThinkingLevel("off");
 		await otherRuntime.session.prompt("hello");
 		const targetSessionFile = otherRuntime.session.sessionFile!;
 

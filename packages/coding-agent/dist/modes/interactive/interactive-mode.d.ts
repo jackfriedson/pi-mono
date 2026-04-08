@@ -47,6 +47,8 @@ export declare class InteractiveMode {
     private lastSigintTime;
     private lastEscapeTime;
     private changelogMarkdown;
+    private startupNoticesShown;
+    private anthropicSubscriptionWarningShown;
     private lastStatusSpacer;
     private lastStatusText;
     private streamingComponent;
@@ -86,6 +88,7 @@ export declare class InteractiveMode {
     private prefixAutocompleteDescription;
     private getBuiltInCommandConflictDiagnostics;
     private setupAutocomplete;
+    private showStartupNoticesIfNeeded;
     init(): Promise<void>;
     /**
      * Update terminal title with session name and cwd.
@@ -104,6 +107,7 @@ export declare class InteractiveMode {
      * Only shows new entries since last seen version, skips for resumed sessions.
      */
     private getChangelogForDisplay;
+    private reportInstallTelemetry;
     private getMarkdownThemeWithSettings;
     private formatDisplayPath;
     /**
@@ -279,6 +283,7 @@ export declare class InteractiveMode {
     private findExactModelMatch;
     private getModelCandidates;
     private updateAvailableProviderCount;
+    private maybeWarnAboutAnthropicSubscriptionAuth;
     private showModelSelector;
     private showModelsSelector;
     private showUserMessageSelector;
@@ -311,6 +316,7 @@ export declare class InteractiveMode {
     private handleClearCommand;
     private handleDebugCommand;
     private handleArminSaysHi;
+    private handleDementedDelves;
     private handleDaxnuts;
     private checkDaxnutsEasterEgg;
     private handleBashCommand;

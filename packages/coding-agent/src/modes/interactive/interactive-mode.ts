@@ -2386,7 +2386,11 @@ export class InteractiveMode {
 		this.defaultEditor.onAction("app.clear", () => this.handleCtrlC());
 		this.defaultEditor.onCtrlD = () => this.handleCtrlD();
 		this.defaultEditor.onAction("app.suspend", () => this.handleCtrlZ());
-		this.defaultEditor.onAction("app.thinking.cycle", () => this.cycleThinkingLevel());
+		this.defaultEditor.onAction("app.thinking.cycle", () => {
+			this.cycleThinkingLevel().catch((error) => {
+				this.showError(error instanceof Error ? error.message : String(error));
+			});
+		});
 		this.defaultEditor.onAction("app.model.cycleForward", () => this.cycleModel("forward"));
 		this.defaultEditor.onAction("app.model.cycleBackward", () => this.cycleModel("backward"));
 
@@ -3352,8 +3356,8 @@ export class InteractiveMode {
 		this.ui.requestRender();
 	}
 
-	private cycleThinkingLevel(): void {
-		const newLevel = this.session.cycleThinkingLevel();
+	private async cycleThinkingLevel(): Promise<void> {
+		const newLevel = await this.session.cycleThinkingLevel();
 		if (newLevel === undefined) {
 			this.showStatus("Current model does not support thinking");
 		} else {
@@ -3799,9 +3803,15 @@ export class InteractiveMode {
 						this.session.agent.transport = transport;
 					},
 					onThinkingLevelChange: (level) => {
-						this.session.setThinkingLevel(level);
-						this.footer.invalidate();
-						this.updateEditorBorderColor();
+						this.session
+							.setThinkingLevel(level)
+							.then(() => {
+								this.footer.invalidate();
+								this.updateEditorBorderColor();
+							})
+							.catch((error) => {
+								this.showError(error instanceof Error ? error.message : String(error));
+							});
 					},
 					onThemeChange: (themeName) => {
 						const result = setTheme(themeName, true);
@@ -5332,7 +5342,7 @@ export class InteractiveMode {
 			);
 
 			// Record the result in session
-			this.session.recordBashResult(command, result, { excludeFromContext });
+			await this.session.recordBashResult(command, result, { excludeFromContext });
 			this.bashComponent = undefined;
 			this.ui.requestRender();
 			return;

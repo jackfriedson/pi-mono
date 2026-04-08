@@ -62,6 +62,7 @@ export interface Settings {
     shellCommandPrefix?: string;
     npmCommand?: string[];
     collapseChangelog?: boolean;
+    enableInstallTelemetry?: boolean;
     packages?: PackageSource[];
     extensions?: string[];
     skills?: string[];
@@ -194,6 +195,8 @@ export declare class SettingsManager {
     setNpmCommand(command: string[] | undefined): void;
     getCollapseChangelog(): boolean;
     setCollapseChangelog(collapse: boolean): void;
+    getEnableInstallTelemetry(): boolean;
+    setEnableInstallTelemetry(enabled: boolean): void;
     getPackages(): PackageSource[];
     setPackages(packages: PackageSource[]): void;
     setProjectPackages(packages: PackageSource[]): void;

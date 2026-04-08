@@ -598,7 +598,7 @@ export async function main(args: string[], options?: MainOptions) {
 				effectiveThinking = "high";
 			}
 			if (effectiveThinking !== created.session.thinkingLevel) {
-				created.session.setThinkingLevel(effectiveThinking);
+				await created.session.setThinkingLevel(effectiveThinking);
 			}
 		}
 

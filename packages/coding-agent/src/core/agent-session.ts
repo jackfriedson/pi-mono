@@ -1399,7 +1399,7 @@ export class AgentSession {
 		this.settingsManager.setDefaultModelAndProvider(model.provider, model.id);
 
 		// Re-clamp thinking level for new model's capabilities
-		this.setThinkingLevel(thinkingLevel);
+		await this.setThinkingLevel(thinkingLevel);
 
 		await this._emitModelSelect(model, previousModel, "set");
 	}
@@ -1439,7 +1439,7 @@ export class AgentSession {
 		// - Explicit scoped model thinking level overrides current session level
 		// - Undefined scoped model thinking level inherits the current session preference
 		// setThinkingLevel clamps to model capabilities.
-		this.setThinkingLevel(thinkingLevel);
+		await this.setThinkingLevel(thinkingLevel);
 
 		await this._emitModelSelect(next.model, currentModel, "cycle");
 
@@ -1464,7 +1464,7 @@ export class AgentSession {
 		this.settingsManager.setDefaultModelAndProvider(nextModel.provider, nextModel.id);
 
 		// Re-clamp thinking level for new model's capabilities
-		this.setThinkingLevel(thinkingLevel);
+		await this.setThinkingLevel(thinkingLevel);
 
 		await this._emitModelSelect(nextModel, currentModel, "cycle");
 
@@ -1480,7 +1480,7 @@ export class AgentSession {
 	 * Clamps to model capabilities based on available thinking levels.
 	 * Saves to session and settings only if the level actually changes.
 	 */
-	setThinkingLevel(level: ThinkingLevel): void {
+	async setThinkingLevel(level: ThinkingLevel): Promise<void> {
 		const availableLevels = this.getAvailableThinkingLevels();
 		const effectiveLevel = availableLevels.includes(level) ? level : this._clampThinkingLevel(level, availableLevels);
 
@@ -1490,7 +1490,7 @@ export class AgentSession {
 		this.agent.state.thinkingLevel = effectiveLevel;
 
 		if (isChanging) {
-			void this.sessionManager.appendThinkingLevelChange(effectiveLevel);
+			await this.sessionManager.appendThinkingLevelChange(effectiveLevel);
 			if (this.supportsThinking() || effectiveLevel !== "off") {
 				this.settingsManager.setDefaultThinkingLevel(effectiveLevel);
 			}
@@ -1501,7 +1501,7 @@ export class AgentSession {
 	 * Cycle to next thinking level.
 	 * @returns New level, or undefined if model doesn't support thinking
 	 */
-	cycleThinkingLevel(): ThinkingLevel | undefined {
+	async cycleThinkingLevel(): Promise<ThinkingLevel | undefined> {
 		if (!this.supportsThinking()) return undefined;
 
 		const levels = this.getAvailableThinkingLevels();
@@ -1509,7 +1509,7 @@ export class AgentSession {
 		const nextIndex = (currentIndex + 1) % levels.length;
 		const nextLevel = levels[nextIndex];
 
-		this.setThinkingLevel(nextLevel);
+		await this.setThinkingLevel(nextLevel);
 		return nextLevel;
 	}
 
@@ -2162,17 +2162,17 @@ export class AgentSession {
 						});
 					});
 				},
-				appendEntry: (customType, data) => {
-					void this.sessionManager.appendCustomEntry(customType, data);
+				appendEntry: async (customType, data) => {
+					await this.sessionManager.appendCustomEntry(customType, data);
 				},
-				setSessionName: (name) => {
-					void this.sessionManager.appendSessionInfo(name);
+				setSessionName: async (name) => {
+					await this.sessionManager.appendSessionInfo(name);
 				},
 				getSessionName: () => {
 					return this.sessionManager.getSessionName();
 				},
-				setLabel: (entryId, label) => {
-					void this.sessionManager.appendLabelChange(entryId, label);
+				setLabel: async (entryId, label) => {
+					await this.sessionManager.appendLabelChange(entryId, label);
 				},
 				getActiveTools: () => this.getActiveToolNames(),
 				getAllTools: () => this.getAllTools(),
@@ -2185,7 +2185,7 @@ export class AgentSession {
 					return true;
 				},
 				getThinkingLevel: () => this.thinkingLevel,
-				setThinkingLevel: (level) => this.setThinkingLevel(level),
+				setThinkingLevel: async (level) => await this.setThinkingLevel(level),
 			},
 			{
 				getModel: () => this.model,
@@ -2567,7 +2567,7 @@ export class AgentSession {
 				},
 			);
 
-			this.recordBashResult(command, result, options);
+			await this.recordBashResult(command, result, options);
 			return result;
 		} finally {
 			this._bashAbortController = undefined;
@@ -2578,7 +2578,11 @@ export class AgentSession {
 	 * Record a bash execution result in session history.
 	 * Used by executeBash and by extensions that handle bash execution themselves.
 	 */
-	recordBashResult(command: string, result: BashResult, options?: { excludeFromContext?: boolean }): void {
+	async recordBashResult(
+		command: string,
+		result: BashResult,
+		options?: { excludeFromContext?: boolean },
+	): Promise<void> {
 		const bashMessage: BashExecutionMessage = {
 			role: "bashExecution",
 			command,
@@ -2600,7 +2604,7 @@ export class AgentSession {
 			this.agent.state.messages.push(bashMessage);
 
 			// Save to session
-			void this.sessionManager.appendMessage(bashMessage);
+			await this.sessionManager.appendMessage(bashMessage);
 		}
 	}
 
@@ -2625,7 +2629,7 @@ export class AgentSession {
 	 * Flush pending bash messages to agent state and session.
 	 * Called after agent turn completes to maintain proper message ordering.
 	 */
-	private _flushPendingBashMessages(): void {
+	private async _flushPendingBashMessages(): Promise<void> {
 		if (this._pendingBashMessages.length === 0) return;
 
 		for (const bashMessage of this._pendingBashMessages) {
@@ -2633,7 +2637,7 @@ export class AgentSession {
 			this.agent.state.messages.push(bashMessage);
 
 			// Save to session
-			void this.sessionManager.appendMessage(bashMessage);
+			await this.sessionManager.appendMessage(bashMessage);
 		}
 
 		this._pendingBashMessages = [];
@@ -2646,8 +2650,8 @@ export class AgentSession {
 	/**
 	 * Set a display name for the current session.
 	 */
-	setSessionName(name: string): void {
-		void this.sessionManager.appendSessionInfo(name);
+	async setSessionName(name: string): Promise<void> {
+		await this.sessionManager.appendSessionInfo(name);
 	}
 
 	// =========================================================================

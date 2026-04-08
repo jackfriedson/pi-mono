@@ -5,10 +5,10 @@
  * createAgentSession() options. The SDK does the heavy lifting.
  */
 import { resolve } from "node:path";
+import { createInterface } from "node:readline";
 import { modelsAreEqual, supportsXhigh } from "@mariozechner/pi-ai";
 import { ProcessTerminal, setKeybindings, TUI } from "@mariozechner/pi-tui";
 import chalk from "chalk";
-import { createInterface } from "readline";
 import { parseArgs, printHelp } from "./cli/args.js";
 import { processFileArguments } from "./cli/file-processor.js";
 import { buildInitialMessage } from "./cli/initial-message.js";
@@ -470,7 +470,7 @@ export async function main(args) {
                 effectiveThinking = "high";
             }
             if (effectiveThinking !== created.session.thinkingLevel) {
-                created.session.setThinkingLevel(effectiveThinking);
+                await created.session.setThinkingLevel(effectiveThinking);
             }
         }
         return {
