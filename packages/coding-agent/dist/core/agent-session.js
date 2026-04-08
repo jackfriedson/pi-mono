@@ -66,6 +66,8 @@ export class AgentSession {
     _unsubscribeAgent;
     _eventListeners = [];
     _agentEventQueue = Promise.resolve();
+    _sessionMutationQueue = Promise.resolve();
+    _sessionMutationError = undefined;
     /** Tracks pending steering messages for UI display. Removed when delivered. */
     _steeringMessages = [];
     /** Tracks pending follow-up messages for UI display. Removed when delivered. */
@@ -237,6 +239,23 @@ export class AgentSession {
         // Keep queue alive if an event handler fails
         this._agentEventQueue.catch(() => { });
     };
+    _queueSessionMutation(mutation) {
+        const runMutation = async () => {
+            if (this._sessionMutationError) {
+                throw this._sessionMutationError;
+            }
+            await mutation();
+        };
+        this._sessionMutationQueue = this._sessionMutationQueue.then(runMutation, runMutation).catch((error) => {
+            const err = error instanceof Error ? error : new Error(String(error));
+            this._sessionMutationError = this._sessionMutationError ?? err;
+            throw this._sessionMutationError;
+        });
+        this._sessionMutationQueue.catch(() => { });
+    }
+    async _waitForSessionMutations() {
+        await this._sessionMutationQueue;
+    }
     _createRetryPromiseForAgentEnd(event) {
         if (event.type !== "agent_end" || this._retryPromise) {
             return;
@@ -708,7 +727,7 @@ export class AgentSession {
             return;
         }
         // Flush any pending bash messages before the new prompt
-        this._flushPendingBashMessages();
+        await this._flushPendingBashMessages();
         // Validate model
         if (!this.model) {
             throw new Error("No model selected.\n\n" +
@@ -774,6 +793,7 @@ export class AgentSession {
         }
         await this.agent.prompt(messages);
         await this.waitForRetry();
+        await this._waitForSessionMutations();
     }
     /**
      * Try to execute an extension command. Returns true if command was found and executed.
@@ -1134,7 +1154,7 @@ export class AgentSession {
         const isChanging = effectiveLevel !== this.agent.state.thinkingLevel;
         this.agent.state.thinkingLevel = effectiveLevel;
         if (isChanging) {
-            void this.sessionManager.appendThinkingLevelChange(effectiveLevel);
+            this._queueSessionMutation(() => this.sessionManager.appendThinkingLevelChange(effectiveLevel));
             if (this.supportsThinking() || effectiveLevel !== "off") {
                 this.settingsManager.setDefaultThinkingLevel(effectiveLevel);
             }
@@ -1713,16 +1733,16 @@ export class AgentSession {
                 });
             },
             appendEntry: (customType, data) => {
-                void this.sessionManager.appendCustomEntry(customType, data);
+                this._queueSessionMutation(() => this.sessionManager.appendCustomEntry(customType, data));
             },
             setSessionName: (name) => {
-                void this.sessionManager.appendSessionInfo(name);
+                this._queueSessionMutation(() => this.sessionManager.appendSessionInfo(name));
             },
             getSessionName: () => {
                 return this.sessionManager.getSessionName();
             },
             setLabel: (entryId, label) => {
-                void this.sessionManager.appendLabelChange(entryId, label);
+                this._queueSessionMutation(() => this.sessionManager.appendLabelChange(entryId, label));
             },
             getActiveTools: () => this.getActiveToolNames(),
             getAllTools: () => this.getAllTools(),
@@ -2041,6 +2061,7 @@ export class AgentSession {
                 signal: this._bashAbortController.signal,
             });
             this.recordBashResult(command, result, options);
+            await this._waitForSessionMutations();
             return result;
         }
         finally {
@@ -2072,7 +2093,7 @@ export class AgentSession {
             // Add to agent state immediately
             this.agent.state.messages.push(bashMessage);
             // Save to session
-            void this.sessionManager.appendMessage(bashMessage);
+            this._queueSessionMutation(() => this.sessionManager.appendMessage(bashMessage));
         }
     }
     /**
@@ -2093,14 +2114,14 @@ export class AgentSession {
      * Flush pending bash messages to agent state and session.
      * Called after agent turn completes to maintain proper message ordering.
      */
-    _flushPendingBashMessages() {
+    async _flushPendingBashMessages() {
         if (this._pendingBashMessages.length === 0)
             return;
         for (const bashMessage of this._pendingBashMessages) {
             // Add to agent state
             this.agent.state.messages.push(bashMessage);
             // Save to session
-            void this.sessionManager.appendMessage(bashMessage);
+            await this.sessionManager.appendMessage(bashMessage);
         }
         this._pendingBashMessages = [];
     }
@@ -2111,7 +2132,7 @@ export class AgentSession {
      * Set a display name for the current session.
      */
     setSessionName(name) {
-        void this.sessionManager.appendSessionInfo(name);
+        this._queueSessionMutation(() => this.sessionManager.appendSessionInfo(name));
     }
     // =========================================================================
     // Tree Navigation

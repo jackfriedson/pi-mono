@@ -240,6 +240,8 @@ export class AgentSession {
 	private _unsubscribeAgent?: () => void;
 	private _eventListeners: AgentSessionEventListener[] = [];
 	private _agentEventQueue: Promise<void> = Promise.resolve();
+	private _sessionMutationQueue: Promise<void> = Promise.resolve();
+	private _sessionMutationError: Error | undefined = undefined;
 
 	/** Tracks pending steering messages for UI display. Removed when delivered. */
 	private _steeringMessages: string[] = [];
@@ -450,6 +452,27 @@ export class AgentSession {
 		// Keep queue alive if an event handler fails
 		this._agentEventQueue.catch(() => {});
 	};
+
+	private _queueSessionMutation(mutation: () => Promise<unknown>): void {
+		const runMutation = async (): Promise<void> => {
+			if (this._sessionMutationError) {
+				throw this._sessionMutationError;
+			}
+			await mutation();
+		};
+
+		this._sessionMutationQueue = this._sessionMutationQueue.then(runMutation, runMutation).catch((error) => {
+			const err = error instanceof Error ? error : new Error(String(error));
+			this._sessionMutationError = this._sessionMutationError ?? err;
+			throw this._sessionMutationError;
+		});
+
+		this._sessionMutationQueue.catch(() => {});
+	}
+
+	private async _waitForSessionMutations(): Promise<void> {
+		await this._sessionMutationQueue;
+	}
 
 	private _createRetryPromiseForAgentEnd(event: AgentEvent): void {
 		if (event.type !== "agent_end" || this._retryPromise) {
@@ -980,7 +1003,7 @@ export class AgentSession {
 		}
 
 		// Flush any pending bash messages before the new prompt
-		this._flushPendingBashMessages();
+		await this._flushPendingBashMessages();
 
 		// Validate model
 		if (!this.model) {
@@ -1063,6 +1086,7 @@ export class AgentSession {
 
 		await this.agent.prompt(messages);
 		await this.waitForRetry();
+		await this._waitForSessionMutations();
 	}
 
 	/**
@@ -1476,7 +1500,7 @@ export class AgentSession {
 		this.agent.state.thinkingLevel = effectiveLevel;
 
 		if (isChanging) {
-			void this.sessionManager.appendThinkingLevelChange(effectiveLevel);
+			this._queueSessionMutation(() => this.sessionManager.appendThinkingLevelChange(effectiveLevel));
 			if (this.supportsThinking() || effectiveLevel !== "off") {
 				this.settingsManager.setDefaultThinkingLevel(effectiveLevel);
 			}
@@ -2149,16 +2173,16 @@ export class AgentSession {
 					});
 				},
 				appendEntry: (customType, data) => {
-					void this.sessionManager.appendCustomEntry(customType, data);
+					this._queueSessionMutation(() => this.sessionManager.appendCustomEntry(customType, data));
 				},
 				setSessionName: (name) => {
-					void this.sessionManager.appendSessionInfo(name);
+					this._queueSessionMutation(() => this.sessionManager.appendSessionInfo(name));
 				},
 				getSessionName: () => {
 					return this.sessionManager.getSessionName();
 				},
 				setLabel: (entryId, label) => {
-					void this.sessionManager.appendLabelChange(entryId, label);
+					this._queueSessionMutation(() => this.sessionManager.appendLabelChange(entryId, label));
 				},
 				getActiveTools: () => this.getActiveToolNames(),
 				getAllTools: () => this.getAllTools(),
@@ -2546,6 +2570,7 @@ export class AgentSession {
 			);
 
 			this.recordBashResult(command, result, options);
+			await this._waitForSessionMutations();
 			return result;
 		} finally {
 			this._bashAbortController = undefined;
@@ -2578,7 +2603,7 @@ export class AgentSession {
 			this.agent.state.messages.push(bashMessage);
 
 			// Save to session
-			void this.sessionManager.appendMessage(bashMessage);
+			this._queueSessionMutation(() => this.sessionManager.appendMessage(bashMessage));
 		}
 	}
 
@@ -2603,7 +2628,7 @@ export class AgentSession {
 	 * Flush pending bash messages to agent state and session.
 	 * Called after agent turn completes to maintain proper message ordering.
 	 */
-	private _flushPendingBashMessages(): void {
+	private async _flushPendingBashMessages(): Promise<void> {
 		if (this._pendingBashMessages.length === 0) return;
 
 		for (const bashMessage of this._pendingBashMessages) {
@@ -2611,7 +2636,7 @@ export class AgentSession {
 			this.agent.state.messages.push(bashMessage);
 
 			// Save to session
-			void this.sessionManager.appendMessage(bashMessage);
+			await this.sessionManager.appendMessage(bashMessage);
 		}
 
 		this._pendingBashMessages = [];
@@ -2625,7 +2650,7 @@ export class AgentSession {
 	 * Set a display name for the current session.
 	 */
 	setSessionName(name: string): void {
-		void this.sessionManager.appendSessionInfo(name);
+		this._queueSessionMutation(() => this.sessionManager.appendSessionInfo(name));
 	}
 
 	// =========================================================================

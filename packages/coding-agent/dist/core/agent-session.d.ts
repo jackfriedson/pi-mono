@@ -148,6 +148,8 @@ export declare class AgentSession {
     private _unsubscribeAgent?;
     private _eventListeners;
     private _agentEventQueue;
+    private _sessionMutationQueue;
+    private _sessionMutationError;
     /** Tracks pending steering messages for UI display. Removed when delivered. */
     private _steeringMessages;
     /** Tracks pending follow-up messages for UI display. Removed when delivered. */
@@ -204,6 +206,8 @@ export declare class AgentSession {
     private _lastAssistantMessage;
     /** Internal handler for agent events - shared by subscribe and reconnect */
     private _handleAgentEvent;
+    private _queueSessionMutation;
+    private _waitForSessionMutations;
     private _createRetryPromiseForAgentEnd;
     private _findLastAssistantInMessages;
     private _processAgentEvent;
@@ -510,10 +514,6 @@ export declare class AgentSession {
     get isBashRunning(): boolean;
     /** Whether there are pending bash messages waiting to be flushed */
     get hasPendingBashMessages(): boolean;
-    /**
-     * Flush pending bash messages to agent state and session.
-     * Called after agent turn completes to maintain proper message ordering.
-     */
     private _flushPendingBashMessages;
     /**
      * Set a display name for the current session.
