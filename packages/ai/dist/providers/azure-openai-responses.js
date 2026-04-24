@@ -1,9 +1,10 @@
 import { AzureOpenAI } from "openai";
 import { getEnvApiKey } from "../env-api-keys.js";
-import { supportsXhigh } from "../models.js";
+import { clampThinkingLevel } from "../models.js";
 import { AssistantMessageEventStream } from "../utils/event-stream.js";
+import { headersToRecord } from "../utils/headers.js";
 import { convertResponsesMessages, convertResponsesTools, processResponsesStream } from "./openai-responses-shared.js";
-import { buildBaseOptions, clampReasoning } from "./simple-options.js";
+import { buildBaseOptions } from "./simple-options.js";
 const DEFAULT_AZURE_API_VERSION = "v1";
 const AZURE_TOOL_CALL_PROVIDERS = new Set(["openai", "openai-codex", "opencode", "azure-openai-responses"]);
 function parseDeploymentNameMap(value) {
@@ -62,7 +63,13 @@ export const streamAzureOpenAIResponses = (model, context, options) => {
             if (nextParams !== undefined) {
                 params = nextParams;
             }
-            const openaiStream = await client.responses.create(params, options?.signal ? { signal: options.signal } : undefined);
+            const requestOptions = {
+                ...(options?.signal ? { signal: options.signal } : {}),
+                ...(options?.timeoutMs !== undefined ? { timeout: options.timeoutMs } : {}),
+                ...(options?.maxRetries !== undefined ? { maxRetries: options.maxRetries } : {}),
+            };
+            const { data: openaiStream, response } = await client.responses.create(params, requestOptions).withResponse();
+            await options?.onResponse?.({ status: response.status, headers: headersToRecord(response.headers) }, model);
             stream.push({ type: "start", partial: output });
             await processResponsesStream(openaiStream, output, stream, model);
             if (options?.signal?.aborted) {
@@ -75,8 +82,11 @@ export const streamAzureOpenAIResponses = (model, context, options) => {
             stream.end();
         }
         catch (error) {
-            for (const block of output.content)
+            for (const block of output.content) {
                 delete block.index;
+                // partialJson is only a streaming scratch buffer; never persist it.
+                delete block.partialJson;
+            }
             output.stopReason = options?.signal?.aborted ? "aborted" : "error";
             output.errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
             stream.push({ type: "error", reason: output.stopReason, error: output });
@@ -91,14 +101,31 @@ export const streamSimpleAzureOpenAIResponses = (model, context, options) => {
         throw new Error(`No API key for provider: ${model.provider}`);
     }
     const base = buildBaseOptions(model, options, apiKey);
-    const reasoningEffort = supportsXhigh(model) ? options?.reasoning : clampReasoning(options?.reasoning);
+    const clampedReasoning = options?.reasoning ? clampThinkingLevel(model, options.reasoning) : undefined;
+    const reasoningEffort = clampedReasoning === "off" ? undefined : clampedReasoning;
     return streamAzureOpenAIResponses(model, context, {
         ...base,
         reasoningEffort,
     });
 };
 function normalizeAzureBaseUrl(baseUrl) {
-    return baseUrl.replace(/\/+$/, "");
+    const trimmed = baseUrl.trim().replace(/\/+$/, "");
+    let url;
+    try {
+        url = new URL(trimmed);
+    }
+    catch {
+        throw new Error(`Invalid Azure OpenAI base URL: ${baseUrl}`);
+    }
+    const isAzureHost = url.hostname.endsWith(".openai.azure.com") || url.hostname.endsWith(".cognitiveservices.azure.com");
+    const normalizedPath = url.pathname.replace(/\/+$/, "");
+    // Ensure Azure hosts have /openai/v1 as base path so the AzureOpenAI SDK
+    // can append /deployments/<model>/... and ?api-version=v1 correctly.
+    if (isAzureHost && (normalizedPath === "" || normalizedPath === "/" || normalizedPath === "/openai")) {
+        url.pathname = "/openai/v1";
+        url.search = "";
+    }
+    return url.toString().replace(/\/+$/, "");
 }
 function buildDefaultBaseUrl(resourceName) {
     return `https://${resourceName}.openai.azure.com/openai/v1`;
@@ -156,19 +183,24 @@ function buildParams(model, context, options, deploymentName) {
     if (options?.temperature !== undefined) {
         params.temperature = options?.temperature;
     }
-    if (context.tools) {
+    if (context.tools && context.tools.length > 0) {
         params.tools = convertResponsesTools(context.tools);
     }
     if (model.reasoning) {
         if (options?.reasoningEffort || options?.reasoningSummary) {
+            const effort = options?.reasoningEffort
+                ? (model.thinkingLevelMap?.[options.reasoningEffort] ?? options.reasoningEffort)
+                : "medium";
             params.reasoning = {
-                effort: options?.reasoningEffort || "medium",
+                effort: effort,
                 summary: options?.reasoningSummary || "auto",
             };
             params.include = ["reasoning.encrypted_content"];
         }
-        else {
-            params.reasoning = { effort: "none" };
+        else if (model.thinkingLevelMap?.off !== null) {
+            params.reasoning = {
+                effort: (model.thinkingLevelMap?.off ?? "none"),
+            };
         }
     }
     return params;

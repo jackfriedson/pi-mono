@@ -27,21 +27,37 @@ export function calculateCost(model, usage) {
     usage.cost.total = usage.cost.input + usage.cost.output + usage.cost.cacheRead + usage.cost.cacheWrite;
     return usage.cost;
 }
-/**
- * Check if a model supports xhigh thinking level.
- *
- * Supported today:
- * - GPT-5.2 / GPT-5.3 / GPT-5.4 model families
- * - Opus 4.6 models (xhigh maps to adaptive effort "max" on Anthropic-compatible providers)
- */
-export function supportsXhigh(model) {
-    if (model.id.includes("gpt-5.2") || model.id.includes("gpt-5.3") || model.id.includes("gpt-5.4")) {
+const EXTENDED_THINKING_LEVELS = ["off", "minimal", "low", "medium", "high", "xhigh"];
+export function getSupportedThinkingLevels(model) {
+    if (!model.reasoning)
+        return ["off"];
+    return EXTENDED_THINKING_LEVELS.filter((level) => {
+        const mapped = model.thinkingLevelMap?.[level];
+        if (mapped === null)
+            return false;
+        if (level === "xhigh")
+            return mapped !== undefined;
         return true;
+    });
+}
+export function clampThinkingLevel(model, level) {
+    const availableLevels = getSupportedThinkingLevels(model);
+    if (availableLevels.includes(level))
+        return level;
+    const requestedIndex = EXTENDED_THINKING_LEVELS.indexOf(level);
+    if (requestedIndex === -1)
+        return availableLevels[0] ?? "off";
+    for (let i = requestedIndex; i < EXTENDED_THINKING_LEVELS.length; i++) {
+        const candidate = EXTENDED_THINKING_LEVELS[i];
+        if (availableLevels.includes(candidate))
+            return candidate;
     }
-    if (model.id.includes("opus-4-6") || model.id.includes("opus-4.6")) {
-        return true;
+    for (let i = requestedIndex - 1; i >= 0; i--) {
+        const candidate = EXTENDED_THINKING_LEVELS[i];
+        if (availableLevels.includes(candidate))
+            return candidate;
     }
-    return false;
+    return availableLevels[0] ?? "off";
 }
 /**
  * Check if two models are equal by comparing both their id and provider.

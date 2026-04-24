@@ -149,12 +149,15 @@ function graphemeWidth(segment) {
         return 2;
     }
     let width = eastAsianWidth(cp);
-    // Trailing halfwidth/fullwidth forms
+    // Trailing halfwidth/fullwidth forms and AM vowels that segment with a base.
     if (segment.length > 1) {
         for (const char of segment.slice(1)) {
             const c = char.codePointAt(0);
             if (c >= 0xff00 && c <= 0xffef) {
                 width += eastAsianWidth(c);
+            }
+            else if (c === 0x0e33 || c === 0x0eb3) {
+                width += 1;
             }
         }
     }
@@ -214,6 +217,19 @@ export function visibleWidth(str) {
     return width;
 }
 /**
+ * Normalize text for terminal output without changing logical editor content.
+ * Some terminals render precomposed Thai/Lao AM vowels inconsistently during
+ * differential repaint. Their compatibility decompositions have the same cell
+ * width but avoid stale-cell artifacts in terminal renderers.
+ */
+const THAI_LAO_AM_REGEX = /[\u0e33\u0eb3]/;
+const THAI_LAO_AM_GLOBAL_REGEX = /[\u0e33\u0eb3]/g;
+export function normalizeTerminalOutput(str) {
+    if (!THAI_LAO_AM_REGEX.test(str))
+        return str;
+    return str.replace(THAI_LAO_AM_GLOBAL_REGEX, (char) => (char === "\u0e33" ? "\u0e4d\u0e32" : "\u0ecd\u0eb2"));
+}
+/**
  * Extract ANSI escape sequences from a string at the given position.
  */
 export function extractAnsiCode(str, pos) {
@@ -257,6 +273,29 @@ export function extractAnsiCode(str, pos) {
     }
     return null;
 }
+function parseOsc8Hyperlink(ansiCode) {
+    if (!ansiCode.startsWith("\x1b]8;")) {
+        return undefined;
+    }
+    const terminator = ansiCode.endsWith("\x07") ? "\x07" : "\x1b\\";
+    const body = ansiCode.slice(4, terminator === "\x07" ? -1 : -2);
+    const separatorIndex = body.indexOf(";");
+    if (separatorIndex === -1) {
+        return undefined;
+    }
+    const params = body.slice(0, separatorIndex);
+    const url = body.slice(separatorIndex + 1);
+    if (!url) {
+        return null;
+    }
+    return { params, url, terminator };
+}
+function formatOsc8Hyperlink(hyperlink) {
+    return `\x1b]8;${hyperlink.params};${hyperlink.url}${hyperlink.terminator}`;
+}
+function formatOsc8Close(terminator) {
+    return `\x1b]8;;${terminator}`;
+}
 /**
  * Track active ANSI SGR codes to preserve styling across line breaks.
  */
@@ -272,7 +311,17 @@ class AnsiCodeTracker {
     strikethrough = false;
     fgColor = null; // Stores the full code like "31" or "38;5;240"
     bgColor = null; // Stores the full code like "41" or "48;5;240"
+    activeHyperlink = null;
     process(ansiCode) {
+        // OSC 8 hyperlink: \x1b]8;;<url>\x1b\\ (open) or \x1b]8;;\x1b\\ (close).
+        // Preserve the original terminator because some terminals only make BEL-terminated
+        // links clickable. OAuth login URLs use BEL, so reopening wrapped lines with ST
+        // made only the first physical line clickable in those terminals.
+        const hyperlink = parseOsc8Hyperlink(ansiCode);
+        if (hyperlink !== undefined) {
+            this.activeHyperlink = hyperlink;
+            return;
+        }
         if (!ansiCode.endsWith("m")) {
             return;
         }
@@ -405,10 +454,12 @@ class AnsiCodeTracker {
         this.strikethrough = false;
         this.fgColor = null;
         this.bgColor = null;
+        // SGR reset does not affect OSC 8 hyperlink state
     }
     /** Clear all state for reuse. */
     clear() {
         this.reset();
+        this.activeHyperlink = null;
     }
     getActiveCodes() {
         const codes = [];
@@ -432,9 +483,11 @@ class AnsiCodeTracker {
             codes.push(this.fgColor);
         if (this.bgColor)
             codes.push(this.bgColor);
-        if (codes.length === 0)
-            return "";
-        return `\x1b[${codes.join(";")}m`;
+        let result = codes.length > 0 ? `\x1b[${codes.join(";")}m` : "";
+        if (this.activeHyperlink) {
+            result += formatOsc8Hyperlink(this.activeHyperlink);
+        }
+        return result;
     }
     hasActiveCodes() {
         return (this.bold ||
@@ -446,20 +499,24 @@ class AnsiCodeTracker {
             this.hidden ||
             this.strikethrough ||
             this.fgColor !== null ||
-            this.bgColor !== null);
+            this.bgColor !== null ||
+            this.activeHyperlink !== null);
     }
     /**
-     * Get reset codes for attributes that need to be turned off at line end,
-     * specifically underline which bleeds into padding.
-     * Returns empty string if no problematic attributes are active.
+     * Get reset codes for attributes that need to be turned off at line end.
+     * Underline must be closed to prevent bleeding into padding.
+     * Active OSC 8 hyperlinks must be closed and re-opened on the next line.
+     * Returns empty string if no attributes need closing.
      */
     getLineEndReset() {
-        // Only underline causes visual bleeding into padding
-        // Other attributes like colors don't visually bleed to padding
+        let result = "";
         if (this.underline) {
-            return "\x1b[24m"; // Underline off only
+            result += "\x1b[24m"; // Underline off only
         }
-        return "";
+        if (this.activeHyperlink) {
+            result += formatOsc8Close(this.activeHyperlink.terminator); // Re-opened at line start via getActiveCodes()
+        }
+        return result;
     }
 }
 function updateTrackerFromText(text, tracker) {

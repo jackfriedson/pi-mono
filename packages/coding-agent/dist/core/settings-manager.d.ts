@@ -8,15 +8,22 @@ export interface BranchSummarySettings {
     reserveTokens?: number;
     skipPrompt?: boolean;
 }
+export interface ProviderRetrySettings {
+    timeoutMs?: number;
+    maxRetries?: number;
+    maxRetryDelayMs?: number;
+}
 export interface RetrySettings {
     enabled?: boolean;
     maxRetries?: number;
     baseDelayMs?: number;
-    maxDelayMs?: number;
+    provider?: ProviderRetrySettings;
 }
 export interface TerminalSettings {
     showImages?: boolean;
+    imageWidthCells?: number;
     clearOnShrink?: boolean;
+    showTerminalProgress?: boolean;
 }
 export interface ImageSettings {
     autoResize?: boolean;
@@ -30,6 +37,9 @@ export interface ThinkingBudgetsSettings {
 }
 export interface MarkdownSettings {
     codeBlockIndent?: string;
+}
+export interface WarningSettings {
+    anthropicExtraUsage?: boolean;
 }
 export type TransportSetting = Transport;
 /**
@@ -79,6 +89,7 @@ export interface Settings {
     autocompleteMaxVisible?: number;
     showHardwareCursor?: boolean;
     markdown?: MarkdownSettings;
+    warnings?: WarningSettings;
     sessionDir?: string;
 }
 export type SettingsScope = "global" | "project";
@@ -92,7 +103,7 @@ export interface SettingsError {
 export declare class FileSettingsStorage implements SettingsStorage {
     private globalSettingsPath;
     private projectSettingsPath;
-    constructor(cwd?: string, agentDir?: string);
+    constructor(cwd: string, agentDir: string);
     private acquireLockSyncWithRetry;
     withLock(scope: SettingsScope, fn: (current: string | undefined) => string | undefined): void;
 }
@@ -116,7 +127,7 @@ export declare class SettingsManager {
     private errors;
     private constructor();
     /** Create a SettingsManager that loads from files */
-    static create(cwd?: string, agentDir?: string): SettingsManager;
+    static create(cwd: string, agentDir?: string): SettingsManager;
     /** Create a SettingsManager from an arbitrary storage backend */
     static fromStorage(storage: SettingsStorage): SettingsManager;
     /** Create an in-memory SettingsManager (no file I/O) */
@@ -181,7 +192,11 @@ export declare class SettingsManager {
         enabled: boolean;
         maxRetries: number;
         baseDelayMs: number;
-        maxDelayMs: number;
+    };
+    getProviderRetrySettings(): {
+        timeoutMs?: number;
+        maxRetries?: number;
+        maxRetryDelayMs: number;
     };
     getHideThinkingBlock(): boolean;
     setHideThinkingBlock(hide: boolean): void;
@@ -217,8 +232,12 @@ export declare class SettingsManager {
     getThinkingBudgets(): ThinkingBudgetsSettings | undefined;
     getShowImages(): boolean;
     setShowImages(show: boolean): void;
+    getImageWidthCells(): number;
+    setImageWidthCells(width: number): void;
     getClearOnShrink(): boolean;
     setClearOnShrink(enabled: boolean): void;
+    getShowTerminalProgress(): boolean;
+    setShowTerminalProgress(enabled: boolean): void;
     getImageAutoResize(): boolean;
     setImageAutoResize(enabled: boolean): void;
     getBlockImages(): boolean;
@@ -236,5 +255,7 @@ export declare class SettingsManager {
     getAutocompleteMaxVisible(): number;
     setAutocompleteMaxVisible(maxVisible: number): void;
     getCodeBlockIndent(): string;
+    getWarnings(): WarningSettings;
+    setWarnings(warnings: WarningSettings): void;
 }
 //# sourceMappingURL=settings-manager.d.ts.map

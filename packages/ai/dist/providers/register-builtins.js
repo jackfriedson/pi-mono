@@ -4,7 +4,6 @@ const importNodeOnlyProvider = (specifier) => import(specifier);
 let anthropicProviderModulePromise;
 let azureOpenAIResponsesProviderModulePromise;
 let googleProviderModulePromise;
-let googleGeminiCliProviderModulePromise;
 let googleVertexProviderModulePromise;
 let mistralProviderModulePromise;
 let openAICodexResponsesProviderModulePromise;
@@ -108,16 +107,6 @@ function loadGoogleProviderModule() {
     });
     return googleProviderModulePromise;
 }
-function loadGoogleGeminiCliProviderModule() {
-    googleGeminiCliProviderModulePromise ||= import("./google-gemini-cli.js").then((module) => {
-        const provider = module;
-        return {
-            stream: provider.streamGoogleGeminiCli,
-            streamSimple: provider.streamSimpleGoogleGeminiCli,
-        };
-    });
-    return googleGeminiCliProviderModulePromise;
-}
 function loadGoogleVertexProviderModule() {
     googleVertexProviderModulePromise ||= import("./google-vertex.js").then((module) => {
         const provider = module;
@@ -187,8 +176,6 @@ export const streamAzureOpenAIResponses = createLazyStream(loadAzureOpenAIRespon
 export const streamSimpleAzureOpenAIResponses = createLazySimpleStream(loadAzureOpenAIResponsesProviderModule);
 export const streamGoogle = createLazyStream(loadGoogleProviderModule);
 export const streamSimpleGoogle = createLazySimpleStream(loadGoogleProviderModule);
-export const streamGoogleGeminiCli = createLazyStream(loadGoogleGeminiCliProviderModule);
-export const streamSimpleGoogleGeminiCli = createLazySimpleStream(loadGoogleGeminiCliProviderModule);
 export const streamGoogleVertex = createLazyStream(loadGoogleVertexProviderModule);
 export const streamSimpleGoogleVertex = createLazySimpleStream(loadGoogleVertexProviderModule);
 export const streamMistral = createLazyStream(loadMistralProviderModule);
@@ -236,11 +223,6 @@ export function registerBuiltInApiProviders() {
         api: "google-generative-ai",
         stream: streamGoogle,
         streamSimple: streamSimpleGoogle,
-    });
-    registerApiProvider({
-        api: "google-gemini-cli",
-        stream: streamGoogleGeminiCli,
-        streamSimple: streamSimpleGoogleGeminiCli,
     });
     registerApiProvider({
         api: "google-vertex",

@@ -6,6 +6,7 @@ export declare function getSegmenter(): Intl.Segmenter;
  * Calculate the visible width of a string in terminal columns.
  */
 export declare function visibleWidth(str: string): number;
+export declare function normalizeTerminalOutput(str: string): string;
 /**
  * Extract ANSI escape sequences from a string at the given position.
  */

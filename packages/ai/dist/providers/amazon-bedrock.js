@@ -29,16 +29,31 @@ export const streamBedrock = (model, context, options = {}) => {
         const config = {
             profile: options.profile,
         };
+        const configuredRegion = getConfiguredBedrockRegion(options);
+        const hasConfiguredProfile = hasConfiguredBedrockProfile();
+        const endpointRegion = getStandardBedrockEndpointRegion(model.baseUrl);
+        const useExplicitEndpoint = shouldUseExplicitBedrockEndpoint(model.baseUrl, configuredRegion, hasConfiguredProfile);
+        // Only pin standard AWS Bedrock runtime endpoints when no region/profile is configured.
+        // This preserves custom endpoints (VPC/proxy) from #3402 without forcing built-in
+        // catalog defaults such as us-east-1 to override AWS_REGION/AWS_PROFILE.
+        if (useExplicitEndpoint) {
+            config.endpoint = model.baseUrl;
+        }
+        // Resolve bearer token for Bedrock API key auth.
+        const bearerToken = options.bearerToken || process.env.AWS_BEARER_TOKEN_BEDROCK || undefined;
+        const useBearerToken = bearerToken !== undefined && process.env.AWS_BEDROCK_SKIP_AUTH !== "1";
         // in Node.js/Bun environment only
         if (typeof process !== "undefined" && (process.versions?.node || process.versions?.bun)) {
             // Region resolution: explicit option > env vars > SDK default chain.
             // When AWS_PROFILE is set, we leave region undefined so the SDK can
             // resovle it from aws profile configs. Otherwise fall back to us-east-1.
-            const explicitRegion = options.region || process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION;
-            if (explicitRegion) {
-                config.region = explicitRegion;
+            if (configuredRegion) {
+                config.region = configuredRegion;
             }
-            else if (!process.env.AWS_PROFILE) {
+            else if (endpointRegion && useExplicitEndpoint) {
+                config.region = endpointRegion;
+            }
+            else if (!hasConfiguredProfile) {
                 config.region = "us-east-1";
             }
             // Support proxies that don't need authentication
@@ -74,7 +89,12 @@ export const streamBedrock = (model, context, options = {}) => {
         else {
             // Non-Node environment (browser): fall back to us-east-1 since
             // there's no config file resolution available.
-            config.region = options.region || "us-east-1";
+            config.region =
+                configuredRegion || (endpointRegion && useExplicitEndpoint ? endpointRegion : undefined) || "us-east-1";
+        }
+        if (useBearerToken) {
+            config.token = { token: bearerToken };
+            config.authSchemePreference = ["httpBearerAuth"];
         }
         try {
             const client = new BedrockRuntimeClient(config);
@@ -83,7 +103,10 @@ export const streamBedrock = (model, context, options = {}) => {
                 modelId: model.id,
                 messages: convertMessages(context, model, cacheRetention),
                 system: buildSystemPrompt(context.systemPrompt, model, cacheRetention),
-                inferenceConfig: { maxTokens: options.maxTokens, temperature: options.temperature },
+                inferenceConfig: {
+                    ...(options.maxTokens !== undefined && { maxTokens: options.maxTokens }),
+                    ...(options.temperature !== undefined && { temperature: options.temperature }),
+                },
                 toolConfig: convertToolConfig(context.tools, options.toolChoice),
                 additionalModelRequestFields: buildAdditionalModelRequestFields(model, options),
                 ...(options.requestMetadata !== undefined && { requestMetadata: options.requestMetadata }),
@@ -94,6 +117,13 @@ export const streamBedrock = (model, context, options = {}) => {
             }
             const command = new ConverseStreamCommand(commandInput);
             const response = await client.send(command, { abortSignal: options.signal });
+            if (response.$metadata.httpStatusCode !== undefined) {
+                const responseHeaders = {};
+                if (response.$metadata.requestId) {
+                    responseHeaders["x-amzn-requestid"] = response.$metadata.requestId;
+                }
+                await options?.onResponse?.({ status: response.$metadata.httpStatusCode, headers: responseHeaders }, model);
+            }
             for await (const item of response.stream) {
                 if (item.messageStart) {
                     if (item.messageStart.role !== ConversationRole.ASSISTANT) {
@@ -144,6 +174,7 @@ export const streamBedrock = (model, context, options = {}) => {
         catch (error) {
             for (const block of output.content) {
                 delete block.index;
+                // partialJson is only a streaming scratch buffer; never persist it.
                 delete block.partialJson;
             }
             output.stopReason = options.signal?.aborted ? "aborted" : "error";
@@ -187,8 +218,8 @@ export const streamSimpleBedrock = (model, context, options) => {
     if (!options?.reasoning) {
         return streamBedrock(model, context, { ...base, reasoning: undefined });
     }
-    if (model.id.includes("anthropic.claude") || model.id.includes("anthropic/claude")) {
-        if (supportsAdaptiveThinking(model.id)) {
+    if (isAnthropicClaudeModel(model)) {
+        if (supportsAdaptiveThinking(model.id, model.name)) {
             return streamBedrock(model, context, {
                 ...base,
                 reasoning: options.reasoning,
@@ -304,21 +335,39 @@ function handleContentBlockStop(event, blocks, output, stream) {
             break;
         case "toolCall":
             block.arguments = parseStreamingJson(block.partialJson);
+            // Finalize in-place and strip the scratch buffer so replay only
+            // carries parsed arguments.
             delete block.partialJson;
             stream.push({ type: "toolcall_end", contentIndex: index, toolCall: block, partial: output });
             break;
     }
 }
 /**
- * Check if the model supports adaptive thinking (Opus 4.6 and Sonnet 4.6).
+ * Check if the model supports adaptive thinking (Opus 4.6+, Sonnet 4.6).
+ * Checks both model ID and model name to support application inference profiles
+ * whose ARNs don't contain the model name.
  */
-function supportsAdaptiveThinking(modelId) {
-    return (modelId.includes("opus-4-6") ||
-        modelId.includes("opus-4.6") ||
-        modelId.includes("sonnet-4-6") ||
-        modelId.includes("sonnet-4.6"));
+function getModelMatchCandidates(modelId, modelName) {
+    const values = modelName ? [modelId, modelName] : [modelId];
+    return values.flatMap((value) => {
+        const lower = value.toLowerCase();
+        return [lower, lower.replace(/[\s_.:]+/g, "-")];
+    });
 }
-function mapThinkingLevelToEffort(level, modelId) {
+function supportsAdaptiveThinking(modelId, modelName) {
+    const candidates = getModelMatchCandidates(modelId, modelName);
+    return candidates.some((s) => s.includes("opus-4-6") || s.includes("opus-4-7") || s.includes("sonnet-4-6"));
+}
+function supportsNativeXhighEffort(model) {
+    const candidates = getModelMatchCandidates(model.id, model.name);
+    return candidates.some((s) => s.includes("opus-4-7"));
+}
+function mapThinkingLevelToEffort(model, level) {
+    if (level === "xhigh" && supportsNativeXhighEffort(model))
+        return "xhigh";
+    const mapped = level ? model.thinkingLevelMap?.[level] : undefined;
+    if (typeof mapped === "string")
+        return mapped;
     switch (level) {
         case "minimal":
         case "low":
@@ -327,8 +376,6 @@ function mapThinkingLevelToEffort(level, modelId) {
             return "medium";
         case "high":
             return "high";
-        case "xhigh":
-            return modelId.includes("opus-4-6") || modelId.includes("opus-4.6") ? "max" : "high";
         default:
             return "high";
     }
@@ -347,6 +394,20 @@ function resolveCacheRetention(cacheRetention) {
     return "short";
 }
 /**
+ * Check if the model is an Anthropic Claude model on Bedrock.
+ * Checks both model ID and model name to support application inference profiles
+ * whose ARNs don't contain the model name.
+ */
+function isAnthropicClaudeModel(model) {
+    const id = model.id.toLowerCase();
+    const name = model.name?.toLowerCase() ?? "";
+    return (id.includes("anthropic.claude") ||
+        id.includes("anthropic/claude") ||
+        name.includes("anthropic.claude") ||
+        name.includes("anthropic/claude") ||
+        name.includes("claude"));
+}
+/**
  * Check if the model supports prompt caching.
  * Supported: Claude 3.5 Haiku, Claude 3.7 Sonnet, Claude 4.x models
  *
@@ -354,12 +415,14 @@ function resolveCacheRetention(cacheRetention) {
  * contains the model name, so we can decide locally.
  *
  * For application inference profiles (whose ARNs don't contain the model name),
- * set AWS_BEDROCK_FORCE_CACHE=1 to enable cache points.  Amazon Nova models
- * have automatic caching and don't need explicit cache points.
+ * also checks model.name which is user-controlled via models.json or registerProvider.
+ * As a last resort, set AWS_BEDROCK_FORCE_CACHE=1 to enable cache points.
+ * Amazon Nova models have automatic caching and don't need explicit cache points.
  */
 function supportsPromptCaching(model) {
-    const id = model.id.toLowerCase();
-    if (!id.includes("claude")) {
+    const candidates = getModelMatchCandidates(model.id, model.name);
+    const hasClaudeRef = candidates.some((s) => s.includes("claude"));
+    if (!hasClaudeRef) {
         // Application inference profiles don't contain the model name in the ARN.
         // Allow users to force cache points via environment variable.
         if (typeof process !== "undefined" && process.env.AWS_BEDROCK_FORCE_CACHE === "1")
@@ -367,13 +430,13 @@ function supportsPromptCaching(model) {
         return false;
     }
     // Claude 4.x models (opus-4, sonnet-4, haiku-4)
-    if (id.includes("-4-") || id.includes("-4."))
+    if (candidates.some((s) => s.includes("-4-")))
         return true;
     // Claude 3.7 Sonnet
-    if (id.includes("claude-3-7-sonnet"))
+    if (candidates.some((s) => s.includes("claude-3-7-sonnet")))
         return true;
     // Claude 3.5 Haiku
-    if (id.includes("claude-3-5-haiku"))
+    if (candidates.some((s) => s.includes("claude-3-5-haiku")))
         return true;
     return false;
 }
@@ -382,10 +445,11 @@ function supportsPromptCaching(model) {
  * Only Anthropic Claude models support the signature field.
  * Other models (OpenAI, Qwen, Minimax, Moonshot, etc.) reject it with:
  * "This model doesn't support the reasoningContent.reasoningText.signature field"
+ *
+ * Checks both model ID and model name to support application inference profiles.
  */
 function supportsThinkingSignature(model) {
-    const id = model.id.toLowerCase();
-    return id.includes("anthropic.claude") || id.includes("anthropic/claude");
+    return isAnthropicClaudeModel(model);
 }
 function buildSystemPrompt(systemPrompt, model, cacheRetention) {
     if (!systemPrompt)
@@ -587,15 +651,58 @@ function mapStopReason(reason) {
             return "error";
     }
 }
+function getConfiguredBedrockRegion(options) {
+    if (typeof process === "undefined") {
+        return options.region;
+    }
+    return options.region || process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || undefined;
+}
+function hasConfiguredBedrockProfile() {
+    if (typeof process === "undefined") {
+        return false;
+    }
+    return Boolean(process.env.AWS_PROFILE);
+}
+function getStandardBedrockEndpointRegion(baseUrl) {
+    if (!baseUrl) {
+        return undefined;
+    }
+    try {
+        const { hostname } = new URL(baseUrl);
+        const match = hostname.toLowerCase().match(/^bedrock-runtime(?:-fips)?\.([a-z0-9-]+)\.amazonaws\.com(?:\.cn)?$/);
+        return match?.[1];
+    }
+    catch {
+        return undefined;
+    }
+}
+function shouldUseExplicitBedrockEndpoint(baseUrl, configuredRegion, hasConfiguredProfile) {
+    const endpointRegion = getStandardBedrockEndpointRegion(baseUrl);
+    if (!endpointRegion) {
+        return true;
+    }
+    return !configuredRegion && !hasConfiguredProfile;
+}
+function isGovCloudBedrockTarget(model, options) {
+    const region = getConfiguredBedrockRegion(options);
+    if (region?.toLowerCase().startsWith("us-gov-")) {
+        return true;
+    }
+    const modelId = model.id.toLowerCase();
+    return modelId.startsWith("us-gov.") || modelId.startsWith("arn:aws-us-gov:");
+}
 function buildAdditionalModelRequestFields(model, options) {
     if (!options.reasoning || !model.reasoning) {
         return undefined;
     }
-    if (model.id.includes("anthropic.claude") || model.id.includes("anthropic/claude")) {
-        const result = supportsAdaptiveThinking(model.id)
+    if (isAnthropicClaudeModel(model)) {
+        // GovCloud Bedrock currently rejects the Claude thinking.display field.
+        // Omit it there until the GovCloud Converse schema catches up.
+        const display = isGovCloudBedrockTarget(model, options) ? undefined : (options.thinkingDisplay ?? "summarized");
+        const result = supportsAdaptiveThinking(model.id, model.name)
             ? {
-                thinking: { type: "adaptive" },
-                output_config: { effort: mapThinkingLevelToEffort(options.reasoning, model.id) },
+                thinking: { type: "adaptive", ...(display !== undefined ? { display } : {}) },
+                output_config: { effort: mapThinkingLevelToEffort(model, options.reasoning) },
             }
             : (() => {
                 const defaultBudgets = {
@@ -612,10 +719,11 @@ function buildAdditionalModelRequestFields(model, options) {
                     thinking: {
                         type: "enabled",
                         budget_tokens: budget,
+                        ...(display !== undefined ? { display } : {}),
                     },
                 };
             })();
-        if (!supportsAdaptiveThinking(model.id) && (options.interleavedThinking ?? true)) {
+        if (!supportsAdaptiveThinking(model.id, model.name) && (options.interleavedThinking ?? true)) {
             result.anthropic_beta = ["interleaved-thinking-2025-05-14"];
         }
         return result;

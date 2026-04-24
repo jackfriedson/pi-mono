@@ -45,6 +45,9 @@ export function fuzzyMatch(query, text) {
         if (queryIndex < normalizedQuery.length) {
             return { matches: false, score: 0 };
         }
+        if (normalizedQuery === textLower) {
+            score -= 100;
+        }
         return { matches: true, score };
     };
     const primaryMatch = matchQuery(queryLower);

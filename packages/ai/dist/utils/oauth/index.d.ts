@@ -5,13 +5,9 @@
  * for OAuth-based providers:
  * - Anthropic (Claude Pro/Max)
  * - GitHub Copilot
- * - Google Cloud Code Assist (Gemini CLI)
- * - Antigravity (Gemini 3, Claude, GPT-OSS via Google Cloud)
  */
 export { anthropicOAuthProvider, loginAnthropic, refreshAnthropicToken } from "./anthropic.js";
 export { getGitHubCopilotBaseUrl, githubCopilotOAuthProvider, loginGitHubCopilot, normalizeDomain, refreshGitHubCopilotToken, } from "./github-copilot.js";
-export { antigravityOAuthProvider, loginAntigravity, refreshAntigravityToken } from "./google-antigravity.js";
-export { geminiCliOAuthProvider, loginGeminiCli, refreshGoogleCloudToken } from "./google-gemini-cli.js";
 export { loginOpenAICodex, openaiCodexOAuthProvider, refreshOpenAICodexToken } from "./openai-codex.js";
 export * from "./types.js";
 import type { OAuthCredentials, OAuthProviderId, OAuthProviderInfo, OAuthProviderInterface } from "./types.js";

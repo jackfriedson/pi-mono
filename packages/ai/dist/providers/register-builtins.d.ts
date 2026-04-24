@@ -3,7 +3,6 @@ import type { BedrockOptions } from "./amazon-bedrock.js";
 import type { AnthropicOptions } from "./anthropic.js";
 import type { AzureOpenAIResponsesOptions } from "./azure-openai-responses.js";
 import type { GoogleOptions } from "./google.js";
-import type { GoogleGeminiCliOptions } from "./google-gemini-cli.js";
 import type { GoogleVertexOptions } from "./google-vertex.js";
 import type { MistralOptions } from "./mistral.js";
 import type { OpenAICodexResponsesOptions } from "./openai-codex-responses.js";
@@ -20,8 +19,6 @@ export declare const streamAzureOpenAIResponses: StreamFunction<"azure-openai-re
 export declare const streamSimpleAzureOpenAIResponses: StreamFunction<"azure-openai-responses", SimpleStreamOptions>;
 export declare const streamGoogle: StreamFunction<"google-generative-ai", GoogleOptions>;
 export declare const streamSimpleGoogle: StreamFunction<"google-generative-ai", SimpleStreamOptions>;
-export declare const streamGoogleGeminiCli: StreamFunction<"google-gemini-cli", GoogleGeminiCliOptions>;
-export declare const streamSimpleGoogleGeminiCli: StreamFunction<"google-gemini-cli", SimpleStreamOptions>;
 export declare const streamGoogleVertex: StreamFunction<"google-vertex", GoogleVertexOptions>;
 export declare const streamSimpleGoogleVertex: StreamFunction<"google-vertex", SimpleStreamOptions>;
 export declare const streamMistral: StreamFunction<"mistral-conversations", MistralOptions>;

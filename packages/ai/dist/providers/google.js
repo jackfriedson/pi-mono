@@ -1,10 +1,10 @@
 import { GoogleGenAI, } from "@google/genai";
 import { getEnvApiKey } from "../env-api-keys.js";
-import { calculateCost } from "../models.js";
+import { calculateCost, clampThinkingLevel } from "../models.js";
 import { AssistantMessageEventStream } from "../utils/event-stream.js";
 import { sanitizeSurrogates } from "../utils/sanitize-unicode.js";
 import { convertMessages, convertTools, isThinkingPart, mapStopReason, mapToolChoice, retainThoughtSignature, } from "./google-shared.js";
-import { buildBaseOptions, clampReasoning } from "./simple-options.js";
+import { buildBaseOptions } from "./simple-options.js";
 // Counter for generating unique tool call IDs
 let toolCallCounter = 0;
 export const streamGoogle = (model, context, options) => {
@@ -222,7 +222,8 @@ export const streamSimpleGoogle = (model, context, options) => {
     if (!options?.reasoning) {
         return streamGoogle(model, context, { ...base, thinking: { enabled: false } });
     }
-    const effort = clampReasoning(options.reasoning);
+    const clampedReasoning = clampThinkingLevel(model, options.reasoning);
+    const effort = (clampedReasoning === "off" ? "high" : clampedReasoning);
     const googleModel = model;
     if (isGemini3ProModel(googleModel) || isGemini3FlashModel(googleModel) || isGemma4Model(googleModel)) {
         return streamGoogle(model, context, {

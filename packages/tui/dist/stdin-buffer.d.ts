@@ -38,8 +38,10 @@ export declare class StdinBuffer extends EventEmitter<StdinBufferEventMap> {
     private readonly timeoutMs;
     private pasteMode;
     private pasteBuffer;
+    private pendingKittyPrintableCodepoint;
     constructor(options?: StdinBufferOptions);
     process(data: string | Buffer): void;
+    private emitDataSequence;
     flush(): string[];
     clear(): void;
     getBuffer(): string;

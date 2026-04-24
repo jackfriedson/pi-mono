@@ -244,6 +244,6 @@ export function ansiToHtml(text) {
  * Each line is wrapped in a div element.
  */
 export function ansiLinesToHtml(lines) {
-    return lines.map((line) => `<div class="ansi-line">${ansiToHtml(line) || "&nbsp;"}</div>`).join("\n");
+    return lines.map((line) => `<div class="ansi-line">${ansiToHtml(line) || "&nbsp;"}</div>`).join("");
 }
 //# sourceMappingURL=ansi-to-html.js.map

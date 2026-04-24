@@ -17,6 +17,7 @@ if (typeof process !== "undefined" && (process.versions?.node || process.version
 }
 import { oauthErrorHtml, oauthSuccessHtml } from "./oauth-page.js";
 import { generatePKCE } from "./pkce.js";
+const CALLBACK_HOST = process.env.PI_OAUTH_CALLBACK_HOST || "127.0.0.1";
 const CLIENT_ID = "app_EMoamEEZ73f0CkXaXp7hrann";
 const AUTHORIZE_URL = "https://auth.openai.com/oauth/authorize";
 const TOKEN_URL = "https://auth.openai.com/oauth/token";
@@ -83,13 +84,18 @@ async function exchangeAuthorizationCode(code, verifier, redirectUri = REDIRECT_
     });
     if (!response.ok) {
         const text = await response.text().catch(() => "");
-        console.error("[openai-codex] code->token failed:", response.status, text);
-        return { type: "failed" };
+        return {
+            type: "failed",
+            status: response.status,
+            message: `OpenAI Codex token exchange failed (${response.status}): ${text || response.statusText}`,
+        };
     }
     const json = (await response.json());
     if (!json.access_token || !json.refresh_token || typeof json.expires_in !== "number") {
-        console.error("[openai-codex] token response missing fields:", json);
-        return { type: "failed" };
+        return {
+            type: "failed",
+            message: `OpenAI Codex token exchange response missing fields: ${JSON.stringify(json)}`,
+        };
     }
     return {
         type: "success",
@@ -111,13 +117,18 @@ async function refreshAccessToken(refreshToken) {
         });
         if (!response.ok) {
             const text = await response.text().catch(() => "");
-            console.error("[openai-codex] Token refresh failed:", response.status, text);
-            return { type: "failed" };
+            return {
+                type: "failed",
+                status: response.status,
+                message: `OpenAI Codex token refresh failed (${response.status}): ${text || response.statusText}`,
+            };
         }
         const json = (await response.json());
         if (!json.access_token || !json.refresh_token || typeof json.expires_in !== "number") {
-            console.error("[openai-codex] Token refresh response missing fields:", json);
-            return { type: "failed" };
+            return {
+                type: "failed",
+                message: `OpenAI Codex token refresh response missing fields: ${JSON.stringify(json)}`,
+            };
         }
         return {
             type: "success",
@@ -127,8 +138,10 @@ async function refreshAccessToken(refreshToken) {
         };
     }
     catch (error) {
-        console.error("[openai-codex] Token refresh error:", error);
-        return { type: "failed" };
+        return {
+            type: "failed",
+            message: `OpenAI Codex token refresh error: ${error instanceof Error ? error.message : String(error)}`,
+        };
     }
 }
 async function createAuthorizationFlow(originator = "pi") {
@@ -196,7 +209,7 @@ function startLocalOAuthServer(state) {
     });
     return new Promise((resolve) => {
         server
-            .listen(1455, "127.0.0.1", () => {
+            .listen(1455, CALLBACK_HOST, () => {
             resolve({
                 close: () => server.close(),
                 cancelWait: () => {
@@ -205,8 +218,7 @@ function startLocalOAuthServer(state) {
                 waitForCode: () => waitForCodePromise,
             });
         })
-            .on("error", (err) => {
-            console.error("[openai-codex] Failed to bind http://127.0.0.1:1455 (", err.code, ") Falling back to manual paste.");
+            .on("error", (_err) => {
             settleWait?.(null);
             resolve({
                 close: () => {
@@ -315,7 +327,7 @@ export async function loginOpenAICodex(options) {
         }
         const tokenResult = await exchangeAuthorizationCode(code, verifier);
         if (tokenResult.type !== "success") {
-            throw new Error("Token exchange failed");
+            throw new Error(tokenResult.message);
         }
         const accountId = getAccountId(tokenResult.access);
         if (!accountId) {
@@ -338,7 +350,7 @@ export async function loginOpenAICodex(options) {
 export async function refreshOpenAICodexToken(refreshToken) {
     const result = await refreshAccessToken(refreshToken);
     if (result.type !== "success") {
-        throw new Error("Failed to refresh OpenAI Codex token");
+        throw new Error(result.message);
     }
     const accountId = getAccountId(result.access);
     if (!accountId) {

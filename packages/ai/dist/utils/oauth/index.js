@@ -5,17 +5,11 @@
  * for OAuth-based providers:
  * - Anthropic (Claude Pro/Max)
  * - GitHub Copilot
- * - Google Cloud Code Assist (Gemini CLI)
- * - Antigravity (Gemini 3, Claude, GPT-OSS via Google Cloud)
  */
 // Anthropic
 export { anthropicOAuthProvider, loginAnthropic, refreshAnthropicToken } from "./anthropic.js";
 // GitHub Copilot
 export { getGitHubCopilotBaseUrl, githubCopilotOAuthProvider, loginGitHubCopilot, normalizeDomain, refreshGitHubCopilotToken, } from "./github-copilot.js";
-// Google Antigravity
-export { antigravityOAuthProvider, loginAntigravity, refreshAntigravityToken } from "./google-antigravity.js";
-// Google Gemini CLI
-export { geminiCliOAuthProvider, loginGeminiCli, refreshGoogleCloudToken } from "./google-gemini-cli.js";
 // OpenAI Codex (ChatGPT OAuth)
 export { loginOpenAICodex, openaiCodexOAuthProvider, refreshOpenAICodexToken } from "./openai-codex.js";
 export * from "./types.js";
@@ -24,14 +18,10 @@ export * from "./types.js";
 // ============================================================================
 import { anthropicOAuthProvider } from "./anthropic.js";
 import { githubCopilotOAuthProvider } from "./github-copilot.js";
-import { antigravityOAuthProvider } from "./google-antigravity.js";
-import { geminiCliOAuthProvider } from "./google-gemini-cli.js";
 import { openaiCodexOAuthProvider } from "./openai-codex.js";
 const BUILT_IN_OAUTH_PROVIDERS = [
     anthropicOAuthProvider,
     githubCopilotOAuthProvider,
-    geminiCliOAuthProvider,
-    antigravityOAuthProvider,
     openaiCodexOAuthProvider,
 ];
 const oauthProviderRegistry = new Map(BUILT_IN_OAUTH_PROVIDERS.map((provider) => [provider.id, provider]));

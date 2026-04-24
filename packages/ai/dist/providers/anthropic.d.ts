@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { SimpleStreamOptions, StreamFunction, StreamOptions } from "../types.js";
-export type AnthropicEffort = "low" | "medium" | "high" | "max";
+export type AnthropicEffort = "low" | "medium" | "high" | "xhigh" | "max";
+export type AnthropicThinkingDisplay = "summarized" | "omitted";
 export interface AnthropicOptions extends StreamOptions {
     /**
      * Enable extended thinking.
@@ -14,15 +15,28 @@ export interface AnthropicOptions extends StreamOptions {
      */
     thinkingBudgetTokens?: number;
     /**
-     * Effort level for adaptive thinking (Opus 4.6 and Sonnet 4.6).
+     * Effort level for adaptive thinking (Opus 4.6+ and Sonnet 4.6).
      * Controls how much thinking Claude allocates:
      * - "max": Always thinks with no constraints (Opus 4.6 only)
+     * - "xhigh": Highest reasoning level (Opus 4.7)
      * - "high": Always thinks, deep reasoning (default)
      * - "medium": Moderate thinking, may skip for simple queries
      * - "low": Minimal thinking, skips for simple tasks
      * Ignored for older models.
      */
     effort?: AnthropicEffort;
+    /**
+     * Controls how thinking content is returned in API responses.
+     * - "summarized": Thinking blocks contain summarized thinking text (default here).
+     * - "omitted": Thinking blocks return an empty thinking field; the encrypted
+     *   signature still travels back for multi-turn continuity. Use for faster
+     *   time-to-first-text-token when your UI does not surface thinking.
+     *
+     * Note: Anthropic's API default for Claude Opus 4.7 and Claude Mythos Preview
+     * is "omitted". We default to "summarized" here to keep behavior consistent
+     * with older Claude 4 models. Set this explicitly to "omitted" to opt in.
+     */
+    thinkingDisplay?: AnthropicThinkingDisplay;
     interleavedThinking?: boolean;
     toolChoice?: "auto" | "any" | "none" | {
         type: "tool";

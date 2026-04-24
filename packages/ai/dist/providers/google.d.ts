@@ -1,5 +1,5 @@
 import type { SimpleStreamOptions, StreamFunction, StreamOptions } from "../types.js";
-import type { GoogleThinkingLevel } from "./google-gemini-cli.js";
+import type { GoogleThinkingLevel } from "./google-shared.js";
 export interface GoogleOptions extends StreamOptions {
     toolChoice?: "auto" | "none" | "any";
     thinking?: {

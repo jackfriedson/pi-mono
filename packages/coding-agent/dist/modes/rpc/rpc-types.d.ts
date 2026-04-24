@@ -101,6 +101,9 @@ export type RpcCommand = {
     entryId: string;
 } | {
     id?: string;
+    type: "clone";
+} | {
+    id?: string;
     type: "get_fork_messages";
 } | {
     id?: string;
@@ -283,6 +286,14 @@ export type RpcResponse = {
     success: true;
     data: {
         text: string;
+        cancelled: boolean;
+    };
+} | {
+    id?: string;
+    type: "response";
+    command: "clone";
+    success: true;
+    data: {
         cancelled: boolean;
     };
 } | {

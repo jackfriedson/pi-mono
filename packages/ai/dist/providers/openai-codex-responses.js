@@ -8,10 +8,13 @@ if (typeof process !== "undefined" && (process.versions?.node || process.version
     });
 }
 import { getEnvApiKey } from "../env-api-keys.js";
-import { supportsXhigh } from "../models.js";
+import { clampThinkingLevel } from "../models.js";
+import { registerSessionResourceCleanup } from "../session-resources.js";
+import { appendAssistantMessageDiagnostic, createAssistantMessageDiagnostic, formatThrownValue, } from "../utils/diagnostics.js";
 import { AssistantMessageEventStream } from "../utils/event-stream.js";
+import { headersToRecord } from "../utils/headers.js";
 import { convertResponsesMessages, convertResponsesTools, processResponsesStream } from "./openai-responses-shared.js";
-import { buildBaseOptions, clampReasoning } from "./simple-options.js";
+import { buildBaseOptions } from "./simple-options.js";
 // ============================================================================
 // Configuration
 // ============================================================================
@@ -20,6 +23,7 @@ const JWT_CLAIM_PATH = "https://api.openai.com/auth";
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 1000;
 const CODEX_TOOL_CALL_PROVIDERS = new Set(["openai", "openai-codex", "opencode"]);
+const WEBSOCKET_MESSAGE_TOO_BIG_CLOSE_CODE = 1009;
 const CODEX_RESPONSE_STATUSES = new Set([
     "completed",
     "incomplete",
@@ -88,8 +92,12 @@ export const streamOpenAICodexResponses = (model, context, options) => {
             const sseHeaders = buildSSEHeaders(model.headers, options?.headers, accountId, apiKey, options?.sessionId);
             const websocketHeaders = buildWebSocketHeaders(model.headers, options?.headers, accountId, apiKey, websocketRequestId);
             const bodyJson = JSON.stringify(body);
-            const transport = options?.transport || "sse";
-            if (transport !== "sse") {
+            const transport = options?.transport || "auto";
+            const websocketDisabledForSession = transport !== "sse" && isWebSocketSseFallbackActive(options?.sessionId);
+            if (websocketDisabledForSession) {
+                recordWebSocketSseFallback(options?.sessionId);
+            }
+            if (transport !== "sse" && !websocketDisabledForSession) {
                 let websocketStarted = false;
                 try {
                     await processWebSocketStream(resolveCodexWebSocketUrl(model.baseUrl), body, websocketHeaders, output, stream, model, () => {
@@ -107,9 +115,22 @@ export const streamOpenAICodexResponses = (model, context, options) => {
                     return;
                 }
                 catch (error) {
-                    if (transport === "websocket" || websocketStarted) {
+                    const aborted = options?.signal?.aborted;
+                    if (aborted || isCodexNonTransportError(error)) {
                         throw error;
                     }
+                    appendAssistantMessageDiagnostic(output, createAssistantMessageDiagnostic("provider_transport_failure", error, {
+                        configuredTransport: transport,
+                        fallbackTransport: websocketStarted ? undefined : "sse",
+                        eventsEmitted: websocketStarted,
+                        phase: websocketStarted ? "after_message_stream_start" : "before_message_stream_start",
+                        requestBytes: new TextEncoder().encode(bodyJson).byteLength,
+                    }));
+                    recordWebSocketFailure(options?.sessionId, error);
+                    if (websocketStarted) {
+                        throw error;
+                    }
+                    recordWebSocketSseFallback(options?.sessionId);
                 }
             }
             // Fetch with retry logic for rate limits and transient errors
@@ -126,6 +147,7 @@ export const streamOpenAICodexResponses = (model, context, options) => {
                         body: bodyJson,
                         signal: options?.signal,
                     });
+                    await options?.onResponse?.({ status: response.status, headers: headersToRecord(response.headers) }, model);
                     if (response.ok) {
                         break;
                     }
@@ -174,6 +196,10 @@ export const streamOpenAICodexResponses = (model, context, options) => {
             stream.end();
         }
         catch (error) {
+            for (const block of output.content) {
+                // partialJson is only a streaming scratch buffer; never persist it.
+                delete block.partialJson;
+            }
             output.stopReason = options?.signal?.aborted ? "aborted" : "error";
             output.errorMessage = error instanceof Error ? error.message : String(error);
             stream.push({ type: "error", reason: output.stopReason, error: output });
@@ -188,7 +214,8 @@ export const streamSimpleOpenAICodexResponses = (model, context, options) => {
         throw new Error(`No API key for provider: ${model.provider}`);
     }
     const base = buildBaseOptions(model, options, apiKey);
-    const reasoningEffort = supportsXhigh(model) ? options?.reasoning : clampReasoning(options?.reasoning);
+    const clampedReasoning = options?.reasoning ? clampThinkingLevel(model, options.reasoning) : undefined;
+    const reasoningEffort = clampedReasoning === "off" ? undefined : clampedReasoning;
     return streamOpenAICodexResponses(model, context, {
         ...base,
         reasoningEffort,
@@ -205,9 +232,9 @@ function buildRequestBody(model, context, options) {
         model: model.id,
         store: false,
         stream: true,
-        instructions: context.systemPrompt,
+        instructions: context.systemPrompt || "You are a helpful assistant.",
         input: messages,
-        text: { verbosity: options?.textVerbosity || "medium" },
+        text: { verbosity: options?.textVerbosity || "low" },
         include: ["reasoning.encrypted_content"],
         prompt_cache_key: options?.sessionId,
         tool_choice: "auto",
@@ -219,39 +246,34 @@ function buildRequestBody(model, context, options) {
     if (options?.serviceTier !== undefined) {
         body.service_tier = options.serviceTier;
     }
-    if (context.tools) {
+    if (context.tools && context.tools.length > 0) {
         body.tools = convertResponsesTools(context.tools, { strict: null });
     }
     if (options?.reasoningEffort !== undefined) {
-        body.reasoning = {
-            effort: clampReasoningEffort(model.id, options.reasoningEffort),
-            summary: options.reasoningSummary ?? "auto",
-        };
+        const effort = options.reasoningEffort === "none"
+            ? (model.thinkingLevelMap?.off ?? "none")
+            : (model.thinkingLevelMap?.[options.reasoningEffort] ?? options.reasoningEffort);
+        if (effort !== null) {
+            body.reasoning = {
+                effort,
+                summary: options.reasoningSummary ?? "auto",
+            };
+        }
     }
     return body;
 }
-function clampReasoningEffort(modelId, effort) {
-    const id = modelId.includes("/") ? modelId.split("/").pop() : modelId;
-    if ((id.startsWith("gpt-5.2") || id.startsWith("gpt-5.3") || id.startsWith("gpt-5.4")) && effort === "minimal")
-        return "low";
-    if (id === "gpt-5.1" && effort === "xhigh")
-        return "high";
-    if (id === "gpt-5.1-codex-mini")
-        return effort === "high" || effort === "xhigh" ? "high" : "medium";
-    return effort;
-}
-function getServiceTierCostMultiplier(serviceTier) {
+function getServiceTierCostMultiplier(model, serviceTier) {
     switch (serviceTier) {
         case "flex":
             return 0.5;
         case "priority":
-            return 2;
+            return model.id === "gpt-5.5" ? 2.5 : 2;
         default:
             return 1;
     }
 }
-function applyServiceTierPricing(usage, serviceTier) {
-    const multiplier = getServiceTierCostMultiplier(serviceTier);
+function applyServiceTierPricing(usage, serviceTier, model) {
+    const multiplier = getServiceTierCostMultiplier(model, serviceTier);
     if (multiplier === 1)
         return;
     usage.cost.input *= multiplier;
@@ -259,6 +281,12 @@ function applyServiceTierPricing(usage, serviceTier) {
     usage.cost.cacheRead *= multiplier;
     usage.cost.cacheWrite *= multiplier;
     usage.cost.total = usage.cost.input + usage.cost.output + usage.cost.cacheRead + usage.cost.cacheWrite;
+}
+function resolveCodexServiceTier(responseServiceTier, requestServiceTier) {
+    if (responseServiceTier === "default" && (requestServiceTier === "flex" || requestServiceTier === "priority")) {
+        return requestServiceTier;
+    }
+    return responseServiceTier ?? requestServiceTier;
 }
 function resolveCodexUrl(baseUrl) {
     const raw = baseUrl && baseUrl.trim().length > 0 ? baseUrl : DEFAULT_CODEX_BASE_URL;
@@ -283,8 +311,32 @@ function resolveCodexWebSocketUrl(baseUrl) {
 async function processStream(response, output, stream, model, options) {
     await processResponsesStream(mapCodexEvents(parseSSE(response)), output, stream, model, {
         serviceTier: options?.serviceTier,
-        applyServiceTierPricing,
+        resolveServiceTier: resolveCodexServiceTier,
+        applyServiceTierPricing: (usage, serviceTier) => applyServiceTierPricing(usage, serviceTier, model),
     });
+}
+class CodexApiError extends Error {
+    code;
+    payload;
+    constructor(message, options) {
+        super(message);
+        this.name = "CodexApiError";
+        this.code = options?.code;
+        this.payload = options?.payload;
+        this.cause = options?.cause;
+    }
+}
+class CodexProtocolError extends Error {
+    payload;
+    constructor(message, options) {
+        super(message);
+        this.name = "CodexProtocolError";
+        this.payload = options?.payload;
+        this.cause = options?.cause;
+    }
+}
+function isCodexNonTransportError(error) {
+    return error instanceof CodexApiError || error instanceof CodexProtocolError;
 }
 async function* mapCodexEvents(events) {
     for await (const event of events) {
@@ -294,11 +346,16 @@ async function* mapCodexEvents(events) {
         if (type === "error") {
             const code = event.code || "";
             const message = event.message || "";
-            throw new Error(`Codex error: ${message || code || JSON.stringify(event)}`);
+            throw new CodexApiError(`Codex error: ${message || code || JSON.stringify(event)}`, {
+                code: code || undefined,
+                payload: event,
+            });
         }
         if (type === "response.failed") {
-            const msg = event.response?.error?.message;
-            throw new Error(msg || "Codex response failed");
+            const response = event.response;
+            const code = response?.error?.code;
+            const message = response?.error?.message;
+            throw new CodexApiError(message || "Codex response failed", { code, payload: event });
         }
         if (type === "response.done" || type === "response.completed" || type === "response.incomplete") {
             const response = event.response;
@@ -345,7 +402,12 @@ async function* parseSSE(response) {
                         try {
                             yield JSON.parse(data);
                         }
-                        catch { }
+                        catch (cause) {
+                            throw new CodexProtocolError(`Invalid Codex SSE JSON: ${formatThrownValue(cause)}`, {
+                                cause,
+                                payload: data,
+                            });
+                        }
                     }
                 }
                 idx = buffer.indexOf("\n\n");
@@ -369,18 +431,95 @@ async function* parseSSE(response) {
 const OPENAI_BETA_RESPONSES_WEBSOCKETS = "responses_websockets=2026-02-06";
 const SESSION_WEBSOCKET_CACHE_TTL_MS = 5 * 60 * 1000;
 const websocketSessionCache = new Map();
+const websocketDebugStats = new Map();
+const websocketSseFallbackSessions = new Set();
+function getOrCreateWebSocketDebugStats(sessionId) {
+    let stats = websocketDebugStats.get(sessionId);
+    if (!stats) {
+        stats = {
+            requests: 0,
+            connectionsCreated: 0,
+            connectionsReused: 0,
+            cachedContextRequests: 0,
+            storeTrueRequests: 0,
+            fullContextRequests: 0,
+            deltaRequests: 0,
+            lastInputItems: 0,
+            websocketFailures: 0,
+            sseFallbacks: 0,
+        };
+        websocketDebugStats.set(sessionId, stats);
+    }
+    return stats;
+}
+export function getOpenAICodexWebSocketDebugStats(sessionId) {
+    const stats = websocketDebugStats.get(sessionId);
+    return stats ? { ...stats } : undefined;
+}
+export function resetOpenAICodexWebSocketDebugStats(sessionId) {
+    if (sessionId) {
+        websocketDebugStats.delete(sessionId);
+        websocketSseFallbackSessions.delete(sessionId);
+        return;
+    }
+    websocketDebugStats.clear();
+    websocketSseFallbackSessions.clear();
+}
+export function closeOpenAICodexWebSocketSessions(sessionId) {
+    const closeEntry = (entry) => {
+        if (entry.idleTimer)
+            clearTimeout(entry.idleTimer);
+        closeWebSocketSilently(entry.socket, 1000, "debug_close");
+    };
+    if (sessionId) {
+        const entry = websocketSessionCache.get(sessionId);
+        if (entry)
+            closeEntry(entry);
+        websocketSessionCache.delete(sessionId);
+        return;
+    }
+    for (const entry of websocketSessionCache.values()) {
+        closeEntry(entry);
+    }
+    websocketSessionCache.clear();
+}
+registerSessionResourceCleanup(closeOpenAICodexWebSocketSessions);
+function isWebSocketSseFallbackActive(sessionId) {
+    return sessionId ? websocketSseFallbackSessions.has(sessionId) : false;
+}
+function recordWebSocketSseFallback(sessionId) {
+    if (!sessionId)
+        return;
+    const stats = getOrCreateWebSocketDebugStats(sessionId);
+    stats.sseFallbacks++;
+    stats.websocketFallbackActive = isWebSocketSseFallbackActive(sessionId);
+}
+function recordWebSocketFailure(sessionId, error) {
+    if (!sessionId)
+        return;
+    websocketSseFallbackSessions.add(sessionId);
+    const stats = getOrCreateWebSocketDebugStats(sessionId);
+    stats.websocketFailures++;
+    stats.lastWebSocketError = formatThrownValue(error);
+    stats.websocketFallbackActive = true;
+}
 function getWebSocketConstructor() {
     const ctor = globalThis.WebSocket;
     if (typeof ctor !== "function")
         return null;
     return ctor;
 }
-function headersToRecord(headers) {
-    const out = {};
-    for (const [key, value] of headers.entries()) {
-        out[key] = value;
+class WebSocketCloseError extends Error {
+    code;
+    reason;
+    wasClean;
+    constructor(message, options) {
+        super(message);
+        this.name = "WebSocketCloseError";
+        this.code = options?.code;
+        this.reason = options?.reason;
+        this.wasClean = options?.wasClean;
     }
-    return out;
 }
 function getWebSocketReadyState(socket) {
     const readyState = socket.readyState;
@@ -473,6 +612,7 @@ async function acquireWebSocket(url, headers, sessionId, signal) {
         const socket = await connectWebSocket(url, headers, signal);
         return {
             socket,
+            reused: false,
             release: ({ keep } = {}) => {
                 if (keep === false) {
                     closeWebSocketSilently(socket);
@@ -492,6 +632,8 @@ async function acquireWebSocket(url, headers, sessionId, signal) {
             cached.busy = true;
             return {
                 socket: cached.socket,
+                entry: cached,
+                reused: true,
                 release: ({ keep } = {}) => {
                     if (!keep || !isWebSocketReusable(cached.socket)) {
                         closeWebSocketSilently(cached.socket);
@@ -507,6 +649,7 @@ async function acquireWebSocket(url, headers, sessionId, signal) {
             const socket = await connectWebSocket(url, headers, signal);
             return {
                 socket,
+                reused: false,
                 release: () => {
                     closeWebSocketSilently(socket);
                 },
@@ -522,6 +665,8 @@ async function acquireWebSocket(url, headers, sessionId, signal) {
     websocketSessionCache.set(sessionId, entry);
     return {
         socket,
+        entry,
+        reused: false,
         release: ({ keep } = {}) => {
             if (!keep || !isWebSocketReusable(entry.socket)) {
                 closeWebSocketSilently(entry.socket);
@@ -538,10 +683,20 @@ async function acquireWebSocket(url, headers, sessionId, signal) {
     };
 }
 function extractWebSocketError(event) {
-    if (event && typeof event === "object" && "message" in event) {
-        const message = event.message;
+    if (event && typeof event === "object") {
+        const message = "message" in event ? event.message : undefined;
         if (typeof message === "string" && message.length > 0) {
             return new Error(message);
+        }
+        const nestedError = "error" in event ? event.error : undefined;
+        if (nestedError instanceof Error && nestedError.message.length > 0) {
+            return nestedError;
+        }
+        if (nestedError && typeof nestedError === "object" && "message" in nestedError) {
+            const nestedMessage = nestedError.message;
+            if (typeof nestedMessage === "string" && nestedMessage.length > 0) {
+                return new Error(nestedMessage);
+            }
         }
     }
     return new Error("WebSocket error");
@@ -550,9 +705,17 @@ function extractWebSocketCloseError(event) {
     if (event && typeof event === "object") {
         const code = "code" in event ? event.code : undefined;
         const reason = "reason" in event ? event.reason : undefined;
+        const wasClean = "wasClean" in event ? event.wasClean : undefined;
         const codeText = typeof code === "number" ? ` ${code}` : "";
-        const reasonText = typeof reason === "string" && reason.length > 0 ? ` ${reason}` : "";
-        return new Error(`WebSocket closed${codeText}${reasonText}`.trim());
+        let reasonText = typeof reason === "string" && reason.length > 0 ? ` ${reason}` : "";
+        if (!reasonText && code === WEBSOCKET_MESSAGE_TOO_BIG_CLOSE_CODE) {
+            reasonText = " message too big";
+        }
+        return new WebSocketCloseError(`WebSocket closed${codeText}${reasonText}`.trim(), {
+            code: typeof code === "number" ? code : undefined,
+            reason: typeof reason === "string" && reason.length > 0 ? reason : undefined,
+            wasClean: typeof wasClean === "boolean" ? wasClean : undefined,
+        });
     }
     return new Error("WebSocket closed");
 }
@@ -588,12 +751,13 @@ async function* parseWebSocket(socket, signal) {
     };
     const onMessage = (event) => {
         void (async () => {
-            if (!event || typeof event !== "object" || !("data" in event))
-                return;
-            const text = await decodeWebSocketData(event.data);
-            if (!text)
-                return;
+            let text = null;
             try {
+                if (!event || typeof event !== "object" || !("data" in event))
+                    return;
+                text = await decodeWebSocketData(event.data);
+                if (!text)
+                    return;
                 const parsed = JSON.parse(text);
                 const type = typeof parsed.type === "string" ? parsed.type : "";
                 if (type === "response.completed" || type === "response.done" || type === "response.incomplete") {
@@ -603,7 +767,14 @@ async function* parseWebSocket(socket, signal) {
                 queue.push(parsed);
                 wake();
             }
-            catch { }
+            catch (cause) {
+                failed = new CodexProtocolError(`Invalid Codex WebSocket JSON: ${formatThrownValue(cause)}`, {
+                    cause,
+                    payload: text,
+                });
+                done = true;
+                wake();
+            }
         })();
     };
     const onError = (event) => {
@@ -661,22 +832,114 @@ async function* parseWebSocket(socket, signal) {
         signal?.removeEventListener("abort", onAbort);
     }
 }
+function requestBodyWithoutInput(body) {
+    const { input: _input, previous_response_id: _previousResponseId, ...rest } = body;
+    return rest;
+}
+function responseInputsEqual(a, b) {
+    return JSON.stringify(a ?? []) === JSON.stringify(b ?? []);
+}
+function requestBodiesMatchExceptInput(a, b) {
+    return JSON.stringify(requestBodyWithoutInput(a)) === JSON.stringify(requestBodyWithoutInput(b));
+}
+function getCachedWebSocketInputDelta(body, continuation) {
+    if (!requestBodiesMatchExceptInput(body, continuation.lastRequestBody)) {
+        return undefined;
+    }
+    const currentInput = body.input ?? [];
+    const baseline = [...(continuation.lastRequestBody.input ?? []), ...continuation.lastResponseItems];
+    if (currentInput.length < baseline.length) {
+        return undefined;
+    }
+    const prefix = currentInput.slice(0, baseline.length);
+    if (!responseInputsEqual(prefix, baseline)) {
+        return undefined;
+    }
+    return currentInput.slice(baseline.length);
+}
+function buildCachedWebSocketRequestBody(entry, body) {
+    const continuation = entry.continuation;
+    if (!continuation) {
+        return body;
+    }
+    const delta = getCachedWebSocketInputDelta(body, continuation);
+    if (!delta || !continuation.lastResponseId) {
+        entry.continuation = undefined;
+        return body;
+    }
+    return {
+        ...body,
+        previous_response_id: continuation.lastResponseId,
+        input: delta,
+    };
+}
+async function* startWebSocketOutputOnFirstEvent(events, output, stream, onStart) {
+    let started = false;
+    for await (const event of events) {
+        if (!started) {
+            started = true;
+            onStart();
+            stream.push({ type: "start", partial: output });
+        }
+        yield event;
+    }
+}
 async function processWebSocketStream(url, body, headers, output, stream, model, onStart, options) {
-    const { socket, release } = await acquireWebSocket(url, headers, options?.sessionId, options?.signal);
+    const { socket, entry, reused, release } = await acquireWebSocket(url, headers, options?.sessionId, options?.signal);
     let keepConnection = true;
+    const useCachedContext = options?.transport === "websocket-cached" || options?.transport === "auto";
+    // ChatGPT Codex Responses rejects `store: true` ("Store must be set to false").
+    // WebSocket continuation still works via connection-scoped previous_response_id state.
+    const fullBody = body;
+    const requestBody = useCachedContext && entry ? buildCachedWebSocketRequestBody(entry, fullBody) : fullBody;
+    const stats = options?.sessionId ? getOrCreateWebSocketDebugStats(options.sessionId) : undefined;
+    if (stats) {
+        stats.requests++;
+        if (reused)
+            stats.connectionsReused++;
+        else
+            stats.connectionsCreated++;
+        if (useCachedContext)
+            stats.cachedContextRequests++;
+        if (requestBody.store === true)
+            stats.storeTrueRequests++;
+        stats.lastInputItems = requestBody.input?.length ?? 0;
+        if (requestBody.previous_response_id) {
+            stats.deltaRequests++;
+            stats.lastDeltaInputItems = requestBody.input?.length ?? 0;
+            stats.lastPreviousResponseId = requestBody.previous_response_id;
+        }
+        else {
+            stats.fullContextRequests++;
+            stats.lastDeltaInputItems = undefined;
+            stats.lastPreviousResponseId = undefined;
+        }
+    }
     try {
-        socket.send(JSON.stringify({ type: "response.create", ...body }));
-        onStart();
-        stream.push({ type: "start", partial: output });
-        await processResponsesStream(mapCodexEvents(parseWebSocket(socket, options?.signal)), output, stream, model, {
+        socket.send(JSON.stringify({ type: "response.create", ...requestBody }));
+        await processResponsesStream(startWebSocketOutputOnFirstEvent(mapCodexEvents(parseWebSocket(socket, options?.signal)), output, stream, onStart), output, stream, model, {
             serviceTier: options?.serviceTier,
-            applyServiceTierPricing,
+            resolveServiceTier: resolveCodexServiceTier,
+            applyServiceTierPricing: (usage, serviceTier) => applyServiceTierPricing(usage, serviceTier, model),
         });
         if (options?.signal?.aborted) {
             keepConnection = false;
         }
+        else if (useCachedContext && entry && output.responseId) {
+            const responseItems = convertResponsesMessages(model, { messages: [output] }, CODEX_TOOL_CALL_PROVIDERS, {
+                includeSystemPrompt: false,
+            }).filter((item) => item.type !== "function_call_output");
+            entry.continuation = {
+                lastRequestBody: fullBody,
+                lastResponseId: output.responseId,
+                lastResponseItems: responseItems,
+            };
+        }
     }
     catch (error) {
+        if (entry) {
+            entry.continuation = undefined;
+        }
         keepConnection = false;
         throw error;
     }
@@ -753,6 +1016,7 @@ function buildSSEHeaders(initHeaders, additionalHeaders, accountId, token, sessi
     headers.set("content-type", "application/json");
     if (sessionId) {
         headers.set("session_id", sessionId);
+        headers.set("x-client-request-id", sessionId);
     }
     return headers;
 }

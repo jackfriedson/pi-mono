@@ -3,14 +3,13 @@
  */
 import type { ThinkingLevel } from "@mariozechner/pi-agent-core";
 import type { ExtensionFlag } from "../core/extensions/types.js";
-import { type ToolName } from "../core/tools/index.js";
 export type Mode = "text" | "json" | "rpc";
 export interface Args {
     provider?: string;
     model?: string;
     apiKey?: string;
     systemPrompt?: string;
-    appendSystemPrompt?: string;
+    appendSystemPrompt?: string[];
     thinking?: ThinkingLevel;
     continue?: boolean;
     resume?: boolean;
@@ -22,8 +21,9 @@ export interface Args {
     fork?: string;
     sessionDir?: string;
     models?: string[];
-    tools?: ToolName[];
+    tools?: string[];
     noTools?: boolean;
+    noBuiltinTools?: boolean;
     extensions?: string[];
     noExtensions?: boolean;
     print?: boolean;
@@ -34,6 +34,7 @@ export interface Args {
     noPromptTemplates?: boolean;
     themes?: string[];
     noThemes?: boolean;
+    noContextFiles?: boolean;
     listModels?: string | true;
     offline?: boolean;
     verbose?: boolean;

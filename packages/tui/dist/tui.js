@@ -7,7 +7,7 @@ import * as path from "node:path";
 import { performance } from "node:perf_hooks";
 import { isKeyRelease, matchesKey } from "./keys.js";
 import { getCapabilities, isImageLine, setCellDimensions } from "./terminal-image.js";
-import { extractSegments, sliceByColumn, sliceWithWidth, visibleWidth } from "./utils.js";
+import { extractSegments, normalizeTerminalOutput, sliceByColumn, sliceWithWidth, visibleWidth } from "./utils.js";
 /** Type guard to check if a component implements Focusable */
 export function isFocusable(component) {
     return component !== null && "focused" in component;
@@ -602,7 +602,7 @@ export class TUI extends Container {
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             if (!isImageLine(line)) {
-                lines[i] = line + reset;
+                lines[i] = normalizeTerminalOutput(line) + reset;
             }
         }
         return lines;

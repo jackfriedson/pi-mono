@@ -245,6 +245,29 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "anthropic.claude-opus-4-7": {
+            id: string;
+            name: string;
+            api: "bedrock-converse-stream";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -290,6 +313,43 @@ export declare const MODELS: {
             maxTokens: number;
         };
         readonly "anthropic.claude-sonnet-4-6": {
+            id: string;
+            name: string;
+            api: "bedrock-converse-stream";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "au.anthropic.claude-opus-4-6-v1": {
+            id: string;
+            name: string;
+            api: "bedrock-converse-stream";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "au.anthropic.claude-sonnet-4-6": {
             id: string;
             name: string;
             api: "bedrock-converse-stream";
@@ -398,6 +458,29 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "eu.anthropic.claude-opus-4-7": {
+            id: string;
+            name: string;
+            api: "bedrock-converse-stream";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -500,6 +583,29 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "global.anthropic.claude-opus-4-7": {
+            id: string;
+            name: string;
+            api: "bedrock-converse-stream";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -1333,6 +1439,29 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "us.anthropic.claude-opus-4-7": {
+            id: string;
+            name: string;
+            api: "bedrock-converse-stream";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -1760,6 +1889,29 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "claude-opus-4-7": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -1857,23 +2009,6 @@ export declare const MODELS: {
         };
     };
     readonly "azure-openai-responses": {
-        readonly "codex-mini-latest": {
-            id: string;
-            name: string;
-            api: "azure-openai-responses";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
-            input: "text"[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
         readonly "gpt-4": {
             id: string;
             name: string;
@@ -2051,6 +2186,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2068,6 +2206,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: false;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2085,6 +2226,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2102,6 +2246,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2119,6 +2266,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2136,6 +2286,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2153,6 +2306,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2170,6 +2326,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2187,6 +2346,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2204,6 +2366,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2221,6 +2386,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2238,6 +2406,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2255,6 +2427,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2272,6 +2448,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2289,6 +2469,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2306,6 +2490,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: false;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2323,6 +2511,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2340,6 +2532,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2357,6 +2553,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2374,6 +2574,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2391,6 +2595,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2408,6 +2616,52 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "gpt-5.5": {
+            id: string;
+            name: string;
+            api: "azure-openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "gpt-5.5-pro": {
+            id: string;
+            name: string;
+            api: "azure-openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2625,6 +2879,1192 @@ export declare const MODELS: {
             maxTokens: number;
         };
     };
+    readonly "cloudflare-ai-gateway": {
+        readonly "claude-3-5-haiku": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: false;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "claude-3-haiku": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: false;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "claude-3-opus": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: false;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "claude-3-sonnet": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: false;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "claude-3.5-haiku": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: false;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "claude-3.5-sonnet": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: false;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "claude-haiku-4-5": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "claude-opus-4": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "claude-opus-4-1": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "claude-opus-4-5": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "claude-opus-4-6": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "claude-opus-4-7": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "claude-sonnet-4": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "claude-sonnet-4-5": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "claude-sonnet-4-6": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "gpt-4": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: false;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "gpt-4-turbo": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: false;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "gpt-4o": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: false;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "gpt-4o-mini": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: false;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "gpt-5.1": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "gpt-5.1-codex": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "gpt-5.2": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "gpt-5.2-codex": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "gpt-5.3-codex": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "gpt-5.4": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "gpt-5.5": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly o1: {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly o3: {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "o3-mini": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "o3-pro": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "o4-mini": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "workers-ai/@cf/moonshotai/kimi-k2.5": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                sendSessionAffinityHeaders: true;
+            };
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "workers-ai/@cf/moonshotai/kimi-k2.6": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                sendSessionAffinityHeaders: true;
+            };
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "workers-ai/@cf/nvidia/nemotron-3-120b-a12b": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                sendSessionAffinityHeaders: true;
+            };
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "workers-ai/@cf/zai-org/glm-4.7-flash": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                sendSessionAffinityHeaders: true;
+            };
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+    };
+    readonly "cloudflare-workers-ai": {
+        readonly "@cf/google/gemma-4-26b-a4b-it": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                sendSessionAffinityHeaders: true;
+            };
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "@cf/meta/llama-4-scout-17b-16e-instruct": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                sendSessionAffinityHeaders: true;
+            };
+            reasoning: false;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "@cf/moonshotai/kimi-k2.5": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                sendSessionAffinityHeaders: true;
+            };
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "@cf/moonshotai/kimi-k2.6": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                sendSessionAffinityHeaders: true;
+            };
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "@cf/nvidia/nemotron-3-120b-a12b": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                sendSessionAffinityHeaders: true;
+            };
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "@cf/openai/gpt-oss-120b": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                sendSessionAffinityHeaders: true;
+            };
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "@cf/openai/gpt-oss-20b": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                sendSessionAffinityHeaders: true;
+            };
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "@cf/zai-org/glm-4.7-flash": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                sendSessionAffinityHeaders: true;
+            };
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+    };
+    readonly deepseek: {
+        readonly "deepseek-v4-flash": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                requiresReasoningContentOnAssistantMessages: true;
+                thinkingFormat: "deepseek";
+            };
+            reasoning: true;
+            thinkingLevelMap: {
+                minimal: null;
+                low: null;
+                medium: null;
+                high: string;
+                xhigh: string;
+            };
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "deepseek-v4-pro": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                requiresReasoningContentOnAssistantMessages: true;
+                thinkingFormat: "deepseek";
+            };
+            reasoning: true;
+            thinkingLevelMap: {
+                minimal: null;
+                low: null;
+                medium: null;
+                high: string;
+                xhigh: string;
+            };
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+    };
+    readonly fireworks: {
+        readonly "accounts/fireworks/models/deepseek-v3p1": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "accounts/fireworks/models/deepseek-v3p2": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "accounts/fireworks/models/deepseek-v4-pro": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "accounts/fireworks/models/glm-4p5": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "accounts/fireworks/models/glm-4p5-air": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "accounts/fireworks/models/glm-4p7": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "accounts/fireworks/models/glm-5": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "accounts/fireworks/models/glm-5p1": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "accounts/fireworks/models/gpt-oss-120b": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "accounts/fireworks/models/gpt-oss-20b": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "accounts/fireworks/models/kimi-k2-instruct": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: false;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "accounts/fireworks/models/kimi-k2-thinking": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "accounts/fireworks/models/kimi-k2p5": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "accounts/fireworks/models/kimi-k2p6": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "accounts/fireworks/models/minimax-m2p1": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "accounts/fireworks/models/minimax-m2p5": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "accounts/fireworks/models/minimax-m2p7": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "accounts/fireworks/models/qwen3p6-plus": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "accounts/fireworks/routers/kimi-k2p5-turbo": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+    };
     readonly "github-copilot": {
         readonly "claude-haiku-4.5": {
             id: string;
@@ -2637,6 +4077,9 @@ export declare const MODELS: {
                 "Editor-Version": string;
                 "Editor-Plugin-Version": string;
                 "Copilot-Integration-Id": string;
+            };
+            compat: {
+                supportsEagerToolInputStreaming: false;
             };
             reasoning: true;
             input: ("image" | "text")[];
@@ -2685,6 +4128,35 @@ export declare const MODELS: {
                 "Copilot-Integration-Id": string;
             };
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "claude-opus-4.7": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            headers: {
+                "User-Agent": string;
+                "Editor-Version": string;
+                "Editor-Plugin-Version": string;
+                "Copilot-Integration-Id": string;
+            };
+            reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2706,6 +4178,9 @@ export declare const MODELS: {
                 "Editor-Version": string;
                 "Editor-Plugin-Version": string;
                 "Copilot-Integration-Id": string;
+            };
+            compat: {
+                supportsEagerToolInputStreaming: false;
             };
             reasoning: true;
             input: ("image" | "text")[];
@@ -2729,6 +4204,9 @@ export declare const MODELS: {
                 "Editor-Version": string;
                 "Editor-Plugin-Version": string;
                 "Copilot-Integration-Id": string;
+            };
+            compat: {
+                supportsEagerToolInputStreaming: false;
             };
             reasoning: true;
             input: ("image" | "text")[];
@@ -2945,6 +4423,9 @@ export declare const MODELS: {
                 "Copilot-Integration-Id": string;
             };
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2968,6 +4449,9 @@ export declare const MODELS: {
                 "Copilot-Integration-Id": string;
             };
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -2991,6 +4475,9 @@ export declare const MODELS: {
                 "Copilot-Integration-Id": string;
             };
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -3014,6 +4501,9 @@ export declare const MODELS: {
                 "Copilot-Integration-Id": string;
             };
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -3037,6 +4527,9 @@ export declare const MODELS: {
                 "Copilot-Integration-Id": string;
             };
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -3060,6 +4553,9 @@ export declare const MODELS: {
                 "Copilot-Integration-Id": string;
             };
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -3083,6 +4579,10 @@ export declare const MODELS: {
                 "Copilot-Integration-Id": string;
             };
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -3106,6 +4606,10 @@ export declare const MODELS: {
                 "Copilot-Integration-Id": string;
             };
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -3129,6 +4633,10 @@ export declare const MODELS: {
                 "Copilot-Integration-Id": string;
             };
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -3152,6 +4660,10 @@ export declare const MODELS: {
                 "Copilot-Integration-Id": string;
             };
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -3175,6 +4687,37 @@ export declare const MODELS: {
                 "Copilot-Integration-Id": string;
             };
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "gpt-5.5": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            headers: {
+                "User-Agent": string;
+                "Editor-Version": string;
+                "Editor-Plugin-Version": string;
+                "Copilot-Integration-Id": string;
+            };
+            reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -3477,6 +5020,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -3494,6 +5040,13 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                minimal: null;
+                low: string;
+                medium: null;
+                high: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -3511,6 +5064,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -3528,6 +5084,13 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                minimal: null;
+                low: string;
+                medium: null;
+                high: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -3545,6 +5108,13 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                minimal: null;
+                low: string;
+                medium: null;
+                high: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -3640,13 +5210,20 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
-        readonly "gemma-4-26b-it": {
+        readonly "gemma-4-26b-a4b-it": {
             id: string;
             name: string;
             api: "google-generative-ai";
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                minimal: string;
+                low: null;
+                medium: null;
+                high: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -3664,265 +5241,13 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
+            thinkingLevelMap: {
+                off: null;
+                minimal: string;
+                low: null;
+                medium: null;
+                high: string;
             };
-            contextWindow: number;
-            maxTokens: number;
-        };
-    };
-    readonly "google-antigravity": {
-        readonly "claude-opus-4-5-thinking": {
-            id: string;
-            name: string;
-            api: "google-gemini-cli";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "claude-opus-4-6-thinking": {
-            id: string;
-            name: string;
-            api: "google-gemini-cli";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "claude-sonnet-4-5": {
-            id: string;
-            name: string;
-            api: "google-gemini-cli";
-            provider: string;
-            baseUrl: string;
-            reasoning: false;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "claude-sonnet-4-5-thinking": {
-            id: string;
-            name: string;
-            api: "google-gemini-cli";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "claude-sonnet-4-6": {
-            id: string;
-            name: string;
-            api: "google-gemini-cli";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "gemini-3-flash": {
-            id: string;
-            name: string;
-            api: "google-gemini-cli";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "gemini-3.1-pro-high": {
-            id: string;
-            name: string;
-            api: "google-gemini-cli";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "gemini-3.1-pro-low": {
-            id: string;
-            name: string;
-            api: "google-gemini-cli";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "gpt-oss-120b-medium": {
-            id: string;
-            name: string;
-            api: "google-gemini-cli";
-            provider: string;
-            baseUrl: string;
-            reasoning: false;
-            input: "text"[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-    };
-    readonly "google-gemini-cli": {
-        readonly "gemini-2.0-flash": {
-            id: string;
-            name: string;
-            api: "google-gemini-cli";
-            provider: string;
-            baseUrl: string;
-            reasoning: false;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "gemini-2.5-flash": {
-            id: string;
-            name: string;
-            api: "google-gemini-cli";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "gemini-2.5-pro": {
-            id: string;
-            name: string;
-            api: "google-gemini-cli";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "gemini-3-flash-preview": {
-            id: string;
-            name: string;
-            api: "google-gemini-cli";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "gemini-3-pro-preview": {
-            id: string;
-            name: string;
-            api: "google-gemini-cli";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "gemini-3.1-pro-preview": {
-            id: string;
-            name: string;
-            api: "google-gemini-cli";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -4095,6 +5420,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -4112,6 +5440,13 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                minimal: null;
+                low: string;
+                medium: null;
+                high: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -4129,6 +5464,13 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                minimal: null;
+                low: string;
+                medium: null;
+                high: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -4146,6 +5488,13 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                minimal: null;
+                low: string;
+                medium: null;
+                high: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -4454,6 +5803,12 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                minimal: null;
+                low: null;
+                medium: null;
+                high: string;
+            };
             input: "text"[];
             cost: {
                 input: number;
@@ -4706,6 +6061,26 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
+        readonly "deepseek-ai/DeepSeek-V4-Pro": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                supportsDeveloperRole: false;
+            };
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
         readonly "moonshotai/Kimi-K2-Instruct": {
             id: string;
             name: string;
@@ -4767,6 +6142,26 @@ export declare const MODELS: {
             maxTokens: number;
         };
         readonly "moonshotai/Kimi-K2.5": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                supportsDeveloperRole: false;
+            };
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "moonshotai/Kimi-K2.6": {
             id: string;
             name: string;
             api: "openai-completions";
@@ -4868,12 +6263,15 @@ export declare const MODELS: {
         };
     };
     readonly "kimi-coding": {
-        readonly k2p5: {
+        readonly "kimi-for-coding": {
             id: string;
             name: string;
             api: "anthropic-messages";
             provider: string;
             baseUrl: string;
+            headers: {
+                "User-Agent": string;
+            };
             reasoning: true;
             input: ("image" | "text")[];
             cost: {
@@ -4891,6 +6289,9 @@ export declare const MODELS: {
             api: "anthropic-messages";
             provider: string;
             baseUrl: string;
+            headers: {
+                "User-Agent": string;
+            };
             reasoning: true;
             input: "text"[];
             cost: {
@@ -5248,13 +6649,47 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
+        readonly "mistral-medium-2604": {
+            id: string;
+            name: string;
+            api: "mistral-conversations";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "mistral-medium-3.5": {
+            id: string;
+            name: string;
+            api: "mistral-conversations";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
         readonly "mistral-medium-latest": {
             id: string;
             name: string;
             api: "mistral-conversations";
             provider: string;
             baseUrl: string;
-            reasoning: false;
+            reasoning: true;
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5419,13 +6854,68 @@ export declare const MODELS: {
             maxTokens: number;
         };
     };
-    readonly openai: {
-        readonly "codex-mini-latest": {
+    readonly moonshotai: {
+        readonly "kimi-k2-0711-preview": {
             id: string;
             name: string;
-            api: "openai-responses";
+            api: "openai-completions";
             provider: string;
             baseUrl: string;
+            compat: {
+                supportsStore: false;
+                supportsDeveloperRole: false;
+                supportsReasoningEffort: false;
+                maxTokensField: "max_tokens";
+                supportsStrictMode: false;
+            };
+            reasoning: false;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "kimi-k2-0905-preview": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                supportsStore: false;
+                supportsDeveloperRole: false;
+                supportsReasoningEffort: false;
+                maxTokensField: "max_tokens";
+                supportsStrictMode: false;
+            };
+            reasoning: false;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "kimi-k2-thinking": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                supportsStore: false;
+                supportsDeveloperRole: false;
+                supportsReasoningEffort: false;
+                maxTokensField: "max_tokens";
+                supportsStrictMode: false;
+            };
             reasoning: true;
             input: "text"[];
             cost: {
@@ -5437,6 +6927,274 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
+        readonly "kimi-k2-thinking-turbo": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                supportsStore: false;
+                supportsDeveloperRole: false;
+                supportsReasoningEffort: false;
+                maxTokensField: "max_tokens";
+                supportsStrictMode: false;
+            };
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "kimi-k2-turbo-preview": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                supportsStore: false;
+                supportsDeveloperRole: false;
+                supportsReasoningEffort: false;
+                maxTokensField: "max_tokens";
+                supportsStrictMode: false;
+            };
+            reasoning: false;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "kimi-k2.5": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                supportsStore: false;
+                supportsDeveloperRole: false;
+                supportsReasoningEffort: false;
+                maxTokensField: "max_tokens";
+                supportsStrictMode: false;
+            };
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "kimi-k2.6": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                supportsStore: false;
+                supportsDeveloperRole: false;
+                supportsReasoningEffort: false;
+                maxTokensField: "max_tokens";
+                supportsStrictMode: false;
+            };
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+    };
+    readonly "moonshotai-cn": {
+        readonly "kimi-k2-0711-preview": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                supportsStore: false;
+                supportsDeveloperRole: false;
+                supportsReasoningEffort: false;
+                maxTokensField: "max_tokens";
+                supportsStrictMode: false;
+            };
+            reasoning: false;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "kimi-k2-0905-preview": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                supportsStore: false;
+                supportsDeveloperRole: false;
+                supportsReasoningEffort: false;
+                maxTokensField: "max_tokens";
+                supportsStrictMode: false;
+            };
+            reasoning: false;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "kimi-k2-thinking": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                supportsStore: false;
+                supportsDeveloperRole: false;
+                supportsReasoningEffort: false;
+                maxTokensField: "max_tokens";
+                supportsStrictMode: false;
+            };
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "kimi-k2-thinking-turbo": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                supportsStore: false;
+                supportsDeveloperRole: false;
+                supportsReasoningEffort: false;
+                maxTokensField: "max_tokens";
+                supportsStrictMode: false;
+            };
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "kimi-k2-turbo-preview": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                supportsStore: false;
+                supportsDeveloperRole: false;
+                supportsReasoningEffort: false;
+                maxTokensField: "max_tokens";
+                supportsStrictMode: false;
+            };
+            reasoning: false;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "kimi-k2.5": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                supportsStore: false;
+                supportsDeveloperRole: false;
+                supportsReasoningEffort: false;
+                maxTokensField: "max_tokens";
+                supportsStrictMode: false;
+            };
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "kimi-k2.6": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                supportsStore: false;
+                supportsDeveloperRole: false;
+                supportsReasoningEffort: false;
+                maxTokensField: "max_tokens";
+                supportsStrictMode: false;
+            };
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+    };
+    readonly openai: {
         readonly "gpt-4": {
             id: string;
             name: string;
@@ -5614,6 +7372,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5631,6 +7392,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: false;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5648,6 +7412,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5665,6 +7432,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5682,6 +7452,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5699,6 +7472,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5716,6 +7492,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5733,6 +7512,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5750,6 +7532,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5767,6 +7552,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5784,6 +7572,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5801,6 +7592,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5818,6 +7613,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5835,6 +7634,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5852,6 +7655,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5869,6 +7676,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: false;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5886,6 +7697,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5903,6 +7718,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5920,6 +7739,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5937,6 +7760,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5954,6 +7781,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -5971,6 +7802,52 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "gpt-5.5": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "gpt-5.5-pro": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6160,6 +8037,12 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                minimal: string;
+                low: string;
+                medium: string;
+                high: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6177,6 +8060,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+                minimal: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6194,6 +8081,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+                minimal: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6211,6 +8102,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+                minimal: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6228,6 +8123,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+                minimal: string;
+            };
             input: "text"[];
             cost: {
                 input: number;
@@ -6245,6 +8144,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+                minimal: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6262,6 +8165,31 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+                minimal: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "gpt-5.5": {
+            id: string;
+            name: string;
+            api: "openai-codex-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+                minimal: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6282,23 +8210,6 @@ export declare const MODELS: {
             baseUrl: string;
             reasoning: true;
             input: "text"[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "claude-3-5-haiku": {
-            id: string;
-            name: string;
-            api: "anthropic-messages";
-            provider: string;
-            baseUrl: string;
-            reasoning: false;
-            input: ("image" | "text")[];
             cost: {
                 input: number;
                 output: number;
@@ -6366,6 +8277,29 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "claude-opus-4-7": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6434,6 +8368,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6451,6 +8388,13 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                minimal: null;
+                low: string;
+                medium: null;
+                high: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6502,6 +8446,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6519,6 +8466,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6536,6 +8486,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6553,6 +8506,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6570,6 +8526,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6587,6 +8546,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6604,6 +8566,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6621,6 +8586,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6638,6 +8607,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6655,6 +8628,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6672,6 +8649,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6689,6 +8670,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6706,6 +8691,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6723,6 +8712,10 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -6733,7 +8726,83 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
+        readonly "gpt-5.5": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "gpt-5.5-pro": {
+            id: string;
+            name: string;
+            api: "openai-responses";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                off: null;
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "hy3-preview-free": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
         readonly "kimi-k2.5": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "kimi-k2.6": {
             id: string;
             name: string;
             api: "openai-completions";
@@ -6784,6 +8853,23 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
+        readonly "minimax-m2.7": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
         readonly "nemotron-3-super-free": {
             id: string;
             name: string;
@@ -6801,8 +8887,98 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
+        readonly "qwen3.5-plus": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "qwen3.6-plus": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
     };
     readonly "opencode-go": {
+        readonly "deepseek-v4-flash": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                requiresReasoningContentOnAssistantMessages: true;
+                thinkingFormat: "deepseek";
+            };
+            reasoning: true;
+            thinkingLevelMap: {
+                minimal: null;
+                low: null;
+                medium: null;
+                high: string;
+                xhigh: string;
+            };
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "deepseek-v4-pro": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                requiresReasoningContentOnAssistantMessages: true;
+                thinkingFormat: "deepseek";
+            };
+            reasoning: true;
+            thinkingLevelMap: {
+                minimal: null;
+                low: null;
+                medium: null;
+                high: string;
+                xhigh: string;
+            };
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
         readonly "glm-5": {
             id: string;
             name: string;
@@ -6854,7 +9030,7 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
-        readonly "mimo-v2-omni": {
+        readonly "kimi-k2.6": {
             id: string;
             name: string;
             api: "openai-completions";
@@ -6871,7 +9047,24 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
-        readonly "mimo-v2-pro": {
+        readonly "mimo-v2.5": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "mimo-v2.5-pro": {
             id: string;
             name: string;
             api: "openai-completions";
@@ -6891,7 +9084,7 @@ export declare const MODELS: {
         readonly "minimax-m2.5": {
             id: string;
             name: string;
-            api: "anthropic-messages";
+            api: "openai-completions";
             provider: string;
             baseUrl: string;
             reasoning: true;
@@ -6908,11 +9101,51 @@ export declare const MODELS: {
         readonly "minimax-m2.7": {
             id: string;
             name: string;
-            api: "anthropic-messages";
+            api: "openai-completions";
             provider: string;
             baseUrl: string;
             reasoning: true;
             input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "qwen3.5-plus": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                thinkingFormat: "qwen";
+            };
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "qwen3.6-plus": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                thinkingFormat: "qwen";
+            };
+            reasoning: true;
+            input: ("image" | "text")[];
             cost: {
                 input: number;
                 output: number;
@@ -7203,6 +9436,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -7220,6 +9456,29 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "anthropic/claude-opus-4.7": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -7281,7 +9540,7 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
-        readonly "arcee-ai/trinity-large-preview:free": {
+        readonly "arcee-ai/trinity-large-preview": {
             id: string;
             name: string;
             api: "openai-completions";
@@ -7357,6 +9616,23 @@ export declare const MODELS: {
             baseUrl: string;
             reasoning: true;
             input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "baidu/cobuddy:free": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
             cost: {
                 input: number;
                 output: number;
@@ -7525,7 +9801,7 @@ export declare const MODELS: {
             api: "openai-completions";
             provider: string;
             baseUrl: string;
-            reasoning: true;
+            reasoning: false;
             input: "text"[];
             cost: {
                 input: number;
@@ -7628,6 +9904,62 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "deepseek/deepseek-v4-flash": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                requiresReasoningContentOnAssistantMessages: true;
+                thinkingFormat: "deepseek";
+            };
+            reasoning: true;
+            thinkingLevelMap: {
+                minimal: null;
+                low: null;
+                medium: null;
+                high: string;
+                xhigh: string;
+            };
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "deepseek/deepseek-v4-pro": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            compat: {
+                requiresReasoningContentOnAssistantMessages: true;
+                thinkingFormat: "deepseek";
+            };
+            reasoning: true;
+            thinkingLevelMap: {
+                minimal: null;
+                low: null;
+                medium: null;
+                high: string;
+                xhigh: string;
+            };
             input: "text"[];
             cost: {
                 input: number;
@@ -7859,6 +10191,40 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
+        readonly "google/gemma-3-12b-it": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: false;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "google/gemma-3-27b-it": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: false;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
         readonly "google/gemma-4-26b-a4b-it": {
             id: string;
             name: string;
@@ -7927,7 +10293,7 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
-        readonly "inception/mercury": {
+        readonly "ibm-granite/granite-4.1-8b": {
             id: string;
             name: string;
             api: "openai-completions";
@@ -7961,7 +10327,24 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
-        readonly "inception/mercury-coder": {
+        readonly "inclusionai/ling-2.6-1t:free": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: false;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "inclusionai/ling-2.6-flash": {
             id: string;
             name: string;
             api: "openai-completions";
@@ -8071,23 +10454,6 @@ export declare const MODELS: {
             baseUrl: string;
             reasoning: false;
             input: "text"[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "meta-llama/llama-4-maverick": {
-            id: string;
-            name: string;
-            api: "openai-completions";
-            provider: string;
-            baseUrl: string;
-            reasoning: false;
-            input: ("image" | "text")[];
             cost: {
                 input: number;
                 output: number;
@@ -8420,6 +10786,23 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
+        readonly "mistralai/mistral-medium-3-5": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
         readonly "mistralai/mistral-medium-3.1": {
             id: string;
             name: string;
@@ -8496,23 +10879,6 @@ export declare const MODELS: {
             baseUrl: string;
             reasoning: false;
             input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "mistralai/mistral-small-creative": {
-            id: string;
-            name: string;
-            api: "openai-completions";
-            provider: string;
-            baseUrl: string;
-            reasoning: false;
-            input: "text"[];
             cost: {
                 input: number;
                 output: number;
@@ -8658,6 +11024,23 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
+        readonly "moonshotai/kimi-k2.6": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
         readonly "nex-agi/deepseek-v3.1-nex-n1": {
             id: string;
             name: string;
@@ -8734,6 +11117,23 @@ export declare const MODELS: {
             baseUrl: string;
             reasoning: true;
             input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
             cost: {
                 input: number;
                 output: number;
@@ -9134,23 +11534,6 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
-        readonly "openai/gpt-4o:extended": {
-            id: string;
-            name: string;
-            api: "openai-completions";
-            provider: string;
-            baseUrl: string;
-            reasoning: false;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
         readonly "openai/gpt-5": {
             id: string;
             name: string;
@@ -9169,40 +11552,6 @@ export declare const MODELS: {
             maxTokens: number;
         };
         readonly "openai/gpt-5-codex": {
-            id: string;
-            name: string;
-            api: "openai-completions";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "openai/gpt-5-image": {
-            id: string;
-            name: string;
-            api: "openai-completions";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "openai/gpt-5-image-mini": {
             id: string;
             name: string;
             api: "openai-completions";
@@ -9362,6 +11711,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -9379,6 +11731,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: false;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -9396,6 +11751,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -9413,6 +11771,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -9430,6 +11791,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: false;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -9447,6 +11811,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -9464,6 +11831,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -9481,6 +11851,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -9498,6 +11871,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -9515,6 +11891,49 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "openai/gpt-5.5": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "openai/gpt-5.5-pro": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -9550,6 +11969,23 @@ export declare const MODELS: {
             baseUrl: string;
             reasoning: false;
             input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "openai/gpt-chat-latest": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: false;
+            input: ("image" | "text")[];
             cost: {
                 input: number;
                 output: number;
@@ -9814,7 +12250,24 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
-        readonly "openrouter/elephant-alpha": {
+        readonly "openrouter/free": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "openrouter/owl-alpha": {
             id: string;
             name: string;
             api: "openai-completions";
@@ -9831,14 +12284,31 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
-        readonly "openrouter/free": {
+        readonly "poolside/laguna-m.1:free": {
             id: string;
             name: string;
             api: "openai-completions";
             provider: string;
             baseUrl: string;
             reasoning: true;
-            input: ("image" | "text")[];
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "poolside/laguna-xs.2:free": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
             cost: {
                 input: number;
                 output: number;
@@ -10041,7 +12511,7 @@ export declare const MODELS: {
             api: "openai-completions";
             provider: string;
             baseUrl: string;
-            reasoning: true;
+            reasoning: false;
             input: "text"[];
             cost: {
                 input: number;
@@ -10579,7 +13049,7 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
-        readonly "qwen/qwen3.6-plus": {
+        readonly "qwen/qwen3.5-plus-20260420": {
             id: string;
             name: string;
             api: "openai-completions";
@@ -10596,7 +13066,58 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
-        readonly "qwen/qwq-32b": {
+        readonly "qwen/qwen3.6-27b": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "qwen/qwen3.6-35b-a3b": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "qwen/qwen3.6-flash": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "qwen/qwen3.6-max-preview": {
             id: string;
             name: string;
             api: "openai-completions";
@@ -10604,6 +13125,23 @@ export declare const MODELS: {
             baseUrl: string;
             reasoning: true;
             input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "qwen/qwen3.6-plus": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
             cost: {
                 input: number;
                 output: number;
@@ -10682,6 +13220,23 @@ export declare const MODELS: {
             maxTokens: number;
         };
         readonly "stepfun/step-3.5-flash": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "tencent/hy3-preview:free": {
             id: string;
             name: string;
             api: "openai-completions";
@@ -10902,6 +13457,23 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
+        readonly "x-ai/grok-4.3": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
         readonly "x-ai/grok-code-fast-1": {
             id: string;
             name: string;
@@ -10954,6 +13526,40 @@ export declare const MODELS: {
             maxTokens: number;
         };
         readonly "xiaomi/mimo-v2-pro": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "xiaomi/mimo-v2.5": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "xiaomi/mimo-v2.5-pro": {
             id: string;
             name: string;
             api: "openai-completions";
@@ -11191,6 +13797,142 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
+        readonly "~anthropic/claude-haiku-latest": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "~anthropic/claude-opus-latest": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "~anthropic/claude-sonnet-latest": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "~google/gemini-flash-latest": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "~google/gemini-pro-latest": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "~moonshotai/kimi-latest": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "~openai/gpt-latest": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "~openai/gpt-mini-latest": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
     };
     readonly "vercel-ai-gateway": {
         readonly "alibaba/qwen-3-14b": {
@@ -11252,6 +13994,23 @@ export declare const MODELS: {
             baseUrl: string;
             reasoning: true;
             input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "alibaba/qwen-3.6-max-preview": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
             cost: {
                 input: number;
                 output: number;
@@ -11448,6 +14207,23 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
+        readonly "alibaba/qwen3.6-27b": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
         readonly "alibaba/qwen3.6-plus": {
             id: string;
             name: string;
@@ -11591,6 +14367,29 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "anthropic/claude-opus-4.7": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -11806,6 +14605,40 @@ export declare const MODELS: {
             maxTokens: number;
         };
         readonly "deepseek/deepseek-v3.2-thinking": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: false;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "deepseek/deepseek-v4-flash": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "deepseek/deepseek-v4-pro": {
             id: string;
             name: string;
             api: "anthropic-messages";
@@ -12502,23 +15335,6 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
-        readonly "moonshotai/kimi-k2-0905": {
-            id: string;
-            name: string;
-            api: "anthropic-messages";
-            provider: string;
-            baseUrl: string;
-            reasoning: false;
-            input: "text"[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
         readonly "moonshotai/kimi-k2-thinking": {
             id: string;
             name: string;
@@ -12571,6 +15387,23 @@ export declare const MODELS: {
             maxTokens: number;
         };
         readonly "moonshotai/kimi-k2.5": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "moonshotai/kimi-k2.6": {
             id: string;
             name: string;
             api: "anthropic-messages";
@@ -12917,6 +15750,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -12934,6 +15770,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -12951,6 +15790,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -12968,6 +15810,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -12985,6 +15830,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -13002,6 +15850,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -13019,6 +15870,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -13036,6 +15890,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -13053,6 +15910,9 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -13070,6 +15930,49 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "openai/gpt-5.5": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "openai/gpt-5.5-pro": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            thinkingLevelMap: {
+                xhigh: string;
+            };
             input: ("image" | "text")[];
             cost: {
                 input: number;
@@ -13250,23 +16153,6 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
-        readonly "prime-intellect/intellect-3": {
-            id: string;
-            name: string;
-            api: "anthropic-messages";
-            provider: string;
-            baseUrl: string;
-            reasoning: true;
-            input: "text"[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
         readonly "xai/grok-3": {
             id: string;
             name: string;
@@ -13359,7 +16245,7 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: false;
-            input: "text"[];
+            input: ("image" | "text")[];
             cost: {
                 input: number;
                 output: number;
@@ -13376,7 +16262,7 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
-            input: "text"[];
+            input: ("image" | "text")[];
             cost: {
                 input: number;
                 output: number;
@@ -13393,7 +16279,7 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: false;
-            input: "text"[];
+            input: ("image" | "text")[];
             cost: {
                 input: number;
                 output: number;
@@ -13410,7 +16296,7 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
-            input: "text"[];
+            input: ("image" | "text")[];
             cost: {
                 input: number;
                 output: number;
@@ -13427,7 +16313,7 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
-            input: "text"[];
+            input: ("image" | "text")[];
             cost: {
                 input: number;
                 output: number;
@@ -13444,7 +16330,7 @@ export declare const MODELS: {
             provider: string;
             baseUrl: string;
             reasoning: true;
-            input: "text"[];
+            input: ("image" | "text")[];
             cost: {
                 input: number;
                 output: number;
@@ -13522,6 +16408,23 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
+        readonly "xai/grok-4.3": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
         readonly "xai/grok-code-fast-1": {
             id: string;
             name: string;
@@ -13564,6 +16467,40 @@ export declare const MODELS: {
             baseUrl: string;
             reasoning: true;
             input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "xiaomi/mimo-v2.5": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "xiaomi/mimo-v2.5-pro": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
             cost: {
                 input: number;
                 output: number;
@@ -14153,6 +17090,23 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
+        readonly "grok-4.3": {
+            id: string;
+            name: string;
+            api: "openai-completions";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
         readonly "grok-beta": {
             id: string;
             name: string;
@@ -14205,17 +17159,13 @@ export declare const MODELS: {
             maxTokens: number;
         };
     };
-    readonly zai: {
-        readonly "glm-4.5": {
+    readonly xiaomi: {
+        readonly "mimo-v2-flash": {
             id: string;
             name: string;
-            api: "openai-completions";
+            api: "anthropic-messages";
             provider: string;
             baseUrl: string;
-            compat: {
-                supportsDeveloperRole: false;
-                thinkingFormat: "zai";
-            };
             reasoning: true;
             input: "text"[];
             cost: {
@@ -14227,6 +17177,337 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
+        readonly "mimo-v2-omni": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "mimo-v2-pro": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "mimo-v2.5": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "mimo-v2.5-pro": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+    };
+    readonly "xiaomi-token-plan-ams": {
+        readonly "mimo-v2-flash": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "mimo-v2-omni": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "mimo-v2-pro": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "mimo-v2.5": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "mimo-v2.5-pro": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+    };
+    readonly "xiaomi-token-plan-cn": {
+        readonly "mimo-v2-flash": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "mimo-v2-omni": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "mimo-v2-pro": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "mimo-v2.5": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "mimo-v2.5-pro": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+    };
+    readonly "xiaomi-token-plan-sgp": {
+        readonly "mimo-v2-flash": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "mimo-v2-omni": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "mimo-v2-pro": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "mimo-v2.5": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: ("image" | "text")[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+        readonly "mimo-v2.5-pro": {
+            id: string;
+            name: string;
+            api: "anthropic-messages";
+            provider: string;
+            baseUrl: string;
+            reasoning: true;
+            input: "text"[];
+            cost: {
+                input: number;
+                output: number;
+                cacheRead: number;
+                cacheWrite: number;
+            };
+            contextWindow: number;
+            maxTokens: number;
+        };
+    };
+    readonly zai: {
         readonly "glm-4.5-air": {
             id: string;
             name: string;
@@ -14248,159 +17529,7 @@ export declare const MODELS: {
             contextWindow: number;
             maxTokens: number;
         };
-        readonly "glm-4.5-flash": {
-            id: string;
-            name: string;
-            api: "openai-completions";
-            provider: string;
-            baseUrl: string;
-            compat: {
-                supportsDeveloperRole: false;
-                thinkingFormat: "zai";
-            };
-            reasoning: true;
-            input: "text"[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "glm-4.5v": {
-            id: string;
-            name: string;
-            api: "openai-completions";
-            provider: string;
-            baseUrl: string;
-            compat: {
-                supportsDeveloperRole: false;
-                thinkingFormat: "zai";
-            };
-            reasoning: true;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "glm-4.6": {
-            id: string;
-            name: string;
-            api: "openai-completions";
-            provider: string;
-            baseUrl: string;
-            compat: {
-                supportsDeveloperRole: false;
-                thinkingFormat: "zai";
-                zaiToolStream: true;
-            };
-            reasoning: true;
-            input: "text"[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "glm-4.6v": {
-            id: string;
-            name: string;
-            api: "openai-completions";
-            provider: string;
-            baseUrl: string;
-            compat: {
-                supportsDeveloperRole: false;
-                thinkingFormat: "zai";
-                zaiToolStream: true;
-            };
-            reasoning: true;
-            input: ("image" | "text")[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
         readonly "glm-4.7": {
-            id: string;
-            name: string;
-            api: "openai-completions";
-            provider: string;
-            baseUrl: string;
-            compat: {
-                supportsDeveloperRole: false;
-                thinkingFormat: "zai";
-                zaiToolStream: true;
-            };
-            reasoning: true;
-            input: "text"[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "glm-4.7-flash": {
-            id: string;
-            name: string;
-            api: "openai-completions";
-            provider: string;
-            baseUrl: string;
-            compat: {
-                supportsDeveloperRole: false;
-                thinkingFormat: "zai";
-                zaiToolStream: true;
-            };
-            reasoning: true;
-            input: "text"[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "glm-4.7-flashx": {
-            id: string;
-            name: string;
-            api: "openai-completions";
-            provider: string;
-            baseUrl: string;
-            compat: {
-                supportsDeveloperRole: false;
-                thinkingFormat: "zai";
-                zaiToolStream: true;
-            };
-            reasoning: true;
-            input: "text"[];
-            cost: {
-                input: number;
-                output: number;
-                cacheRead: number;
-                cacheWrite: number;
-            };
-            contextWindow: number;
-            maxTokens: number;
-        };
-        readonly "glm-5": {
             id: string;
             name: string;
             api: "openai-completions";

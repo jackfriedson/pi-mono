@@ -9,6 +9,7 @@ export interface AgentOptions {
     streamFn?: StreamFn;
     getApiKey?: (provider: string) => Promise<string | undefined> | string | undefined;
     onPayload?: SimpleStreamOptions["onPayload"];
+    onResponse?: SimpleStreamOptions["onResponse"];
     beforeToolCall?: (context: BeforeToolCallContext, signal?: AbortSignal) => Promise<BeforeToolCallResult | undefined>;
     afterToolCall?: (context: AfterToolCallContext, signal?: AbortSignal) => Promise<AfterToolCallResult | undefined>;
     steeringMode?: QueueMode;
@@ -35,6 +36,7 @@ export declare class Agent {
     streamFn: StreamFn;
     getApiKey?: (provider: string) => Promise<string | undefined> | string | undefined;
     onPayload?: SimpleStreamOptions["onPayload"];
+    onResponse?: SimpleStreamOptions["onResponse"];
     beforeToolCall?: (context: BeforeToolCallContext, signal?: AbortSignal) => Promise<BeforeToolCallResult | undefined>;
     afterToolCall?: (context: AfterToolCallContext, signal?: AbortSignal) => Promise<AfterToolCallResult | undefined>;
     private activeRun?;

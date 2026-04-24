@@ -1,9 +1,14 @@
 /**
- * Shared utilities for Google Generative AI and Google Cloud Code Assist providers.
+ * Shared utilities for Google Generative AI and Google Vertex providers.
  */
 import { type Content, FinishReason, FunctionCallingConfigMode, type Part } from "@google/genai";
 import type { Context, Model, StopReason, Tool } from "../types.js";
-type GoogleApiType = "google-generative-ai" | "google-gemini-cli" | "google-vertex";
+type GoogleApiType = "google-generative-ai" | "google-vertex";
+/**
+ * Thinking level for Gemini 3 models.
+ * Mirrors Google's ThinkingLevel enum values.
+ */
+export type GoogleThinkingLevel = "THINKING_LEVEL_UNSPECIFIED" | "MINIMAL" | "LOW" | "MEDIUM" | "HIGH";
 /**
  * Determines whether a streamed Gemini `Part` should be treated as "thinking".
  *

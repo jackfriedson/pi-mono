@@ -151,6 +151,13 @@ function isCompleteApcSequence(data) {
 /**
  * Split accumulated buffer into complete sequences
  */
+function parseUnmodifiedKittyPrintableCodepoint(sequence) {
+    const match = sequence.match(/^\x1b\[(\d+)(?::\d*)?(?::\d+)?u$/);
+    if (!match)
+        return undefined;
+    const codepoint = parseInt(match[1], 10);
+    return codepoint >= 32 ? codepoint : undefined;
+}
 function extractCompleteSequences(buffer) {
     const sequences = [];
     let pos = 0;
@@ -200,6 +207,7 @@ export class StdinBuffer extends EventEmitter {
     timeoutMs;
     pasteMode = false;
     pasteBuffer = "";
+    pendingKittyPrintableCodepoint;
     constructor(options = {}) {
         super();
         this.timeoutMs = options.timeout ?? 10;
@@ -226,7 +234,7 @@ export class StdinBuffer extends EventEmitter {
             str = data;
         }
         if (str.length === 0 && this.buffer.length === 0) {
-            this.emit("data", "");
+            this.emitDataSequence("");
             return;
         }
         this.buffer += str;
@@ -239,6 +247,7 @@ export class StdinBuffer extends EventEmitter {
                 const remaining = this.pasteBuffer.slice(endIndex + BRACKETED_PASTE_END.length);
                 this.pasteMode = false;
                 this.pasteBuffer = "";
+                this.pendingKittyPrintableCodepoint = undefined;
                 this.emit("paste", pastedContent);
                 if (remaining.length > 0) {
                     this.process(remaining);
@@ -252,9 +261,10 @@ export class StdinBuffer extends EventEmitter {
                 const beforePaste = this.buffer.slice(0, startIndex);
                 const result = extractCompleteSequences(beforePaste);
                 for (const sequence of result.sequences) {
-                    this.emit("data", sequence);
+                    this.emitDataSequence(sequence);
                 }
             }
+            this.pendingKittyPrintableCodepoint = undefined;
             this.buffer = this.buffer.slice(startIndex + BRACKETED_PASTE_START.length);
             this.pasteMode = true;
             this.pasteBuffer = this.buffer;
@@ -265,6 +275,7 @@ export class StdinBuffer extends EventEmitter {
                 const remaining = this.pasteBuffer.slice(endIndex + BRACKETED_PASTE_END.length);
                 this.pasteMode = false;
                 this.pasteBuffer = "";
+                this.pendingKittyPrintableCodepoint = undefined;
                 this.emit("paste", pastedContent);
                 if (remaining.length > 0) {
                     this.process(remaining);
@@ -275,16 +286,25 @@ export class StdinBuffer extends EventEmitter {
         const result = extractCompleteSequences(this.buffer);
         this.buffer = result.remainder;
         for (const sequence of result.sequences) {
-            this.emit("data", sequence);
+            this.emitDataSequence(sequence);
         }
         if (this.buffer.length > 0) {
             this.timeout = setTimeout(() => {
                 const flushed = this.flush();
                 for (const sequence of flushed) {
-                    this.emit("data", sequence);
+                    this.emitDataSequence(sequence);
                 }
             }, this.timeoutMs);
         }
+    }
+    emitDataSequence(sequence) {
+        const rawCodepoint = sequence.length === 1 ? sequence.codePointAt(0) : undefined;
+        if (rawCodepoint !== undefined && rawCodepoint === this.pendingKittyPrintableCodepoint) {
+            this.pendingKittyPrintableCodepoint = undefined;
+            return;
+        }
+        this.pendingKittyPrintableCodepoint = parseUnmodifiedKittyPrintableCodepoint(sequence);
+        this.emit("data", sequence);
     }
     flush() {
         if (this.timeout) {
@@ -296,6 +316,7 @@ export class StdinBuffer extends EventEmitter {
         }
         const sequences = [this.buffer];
         this.buffer = "";
+        this.pendingKittyPrintableCodepoint = undefined;
         return sequences;
     }
     clear() {
@@ -306,6 +327,7 @@ export class StdinBuffer extends EventEmitter {
         this.buffer = "";
         this.pasteMode = false;
         this.pasteBuffer = "";
+        this.pendingKittyPrintableCodepoint = undefined;
     }
     getBuffer() {
         return this.buffer;

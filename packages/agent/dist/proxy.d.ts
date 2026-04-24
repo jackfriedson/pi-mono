@@ -55,31 +55,15 @@ export type ProxyAssistantMessageEvent = {
     errorMessage?: string;
     usage: AssistantMessage["usage"];
 };
-export interface ProxyStreamOptions extends SimpleStreamOptions {
+type ProxySerializableStreamOptions = Pick<SimpleStreamOptions, "temperature" | "maxTokens" | "reasoning" | "cacheRetention" | "sessionId" | "headers" | "metadata" | "transport" | "thinkingBudgets" | "maxRetryDelayMs">;
+export interface ProxyStreamOptions extends ProxySerializableStreamOptions {
+    /** Local abort signal for the proxy request */
+    signal?: AbortSignal;
     /** Auth token for the proxy server */
     authToken: string;
     /** Proxy server URL (e.g., "https://genai.example.com") */
     proxyUrl: string;
 }
-/**
- * Stream function that proxies through a server instead of calling LLM providers directly.
- * The server strips the partial field from delta events to reduce bandwidth.
- * We reconstruct the partial message client-side.
- *
- * Use this as the `streamFn` option when creating an Agent that needs to go through a proxy.
- *
- * @example
- * ```typescript
- * const agent = new Agent({
- *   streamFn: (model, context, options) =>
- *     streamProxy(model, context, {
- *       ...options,
- *       authToken: await getAuthToken(),
- *       proxyUrl: "https://genai.example.com",
- *     }),
- * });
- * ```
- */
 export declare function streamProxy(model: Model<any>, context: Context, options: ProxyStreamOptions): ProxyMessageEventStream;
 export {};
 //# sourceMappingURL=proxy.d.ts.map

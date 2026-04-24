@@ -6,7 +6,14 @@ export declare const isBunBinary: boolean;
 /** Detect if Bun is the runtime (compiled binary or bun run) */
 export declare const isBunRuntime: boolean;
 export type InstallMethod = "bun-binary" | "npm" | "pnpm" | "yarn" | "bun" | "unknown";
+export interface SelfUpdateCommand {
+    command: string;
+    args: string[];
+    display: string;
+}
 export declare function detectInstallMethod(): InstallMethod;
+export declare function getSelfUpdateCommand(packageName: string, npmCommand?: string[]): SelfUpdateCommand | undefined;
+export declare function getSelfUpdateUnavailableInstruction(packageName: string, npmCommand?: string[]): string;
 export declare function getUpdateInstruction(packageName: string): string;
 /**
  * Get the base directory for resolving package assets (themes, package.json, README.md, CHANGELOG.md).
@@ -48,10 +55,14 @@ export declare function getChangelogPath(): string;
 export declare function getInteractiveAssetsDir(): string;
 /** Get path to a bundled interactive asset */
 export declare function getBundledInteractiveAssetPath(name: string): string;
+export declare const PACKAGE_NAME: string;
 export declare const APP_NAME: string;
+export declare const APP_TITLE: string;
 export declare const CONFIG_DIR_NAME: string;
 export declare const VERSION: string;
 export declare const ENV_AGENT_DIR: string;
+export declare const ENV_SESSION_DIR: string;
+export declare function expandTildePath(path: string): string;
 /** Get the share viewer URL for a gist ID */
 export declare function getShareViewerUrl(gistId: string): string;
 /** Get the agent config directory (e.g., ~/.pi/agent/) */

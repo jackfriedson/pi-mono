@@ -8,4 +8,23 @@ export interface OpenAICodexResponsesOptions extends StreamOptions {
 }
 export declare const streamOpenAICodexResponses: StreamFunction<"openai-codex-responses", OpenAICodexResponsesOptions>;
 export declare const streamSimpleOpenAICodexResponses: StreamFunction<"openai-codex-responses", SimpleStreamOptions>;
+export interface OpenAICodexWebSocketDebugStats {
+    requests: number;
+    connectionsCreated: number;
+    connectionsReused: number;
+    cachedContextRequests: number;
+    storeTrueRequests: number;
+    fullContextRequests: number;
+    deltaRequests: number;
+    lastInputItems: number;
+    lastDeltaInputItems?: number;
+    lastPreviousResponseId?: string;
+    websocketFailures: number;
+    sseFallbacks: number;
+    websocketFallbackActive?: boolean;
+    lastWebSocketError?: string;
+}
+export declare function getOpenAICodexWebSocketDebugStats(sessionId: string): OpenAICodexWebSocketDebugStats | undefined;
+export declare function resetOpenAICodexWebSocketDebugStats(sessionId?: string): void;
+export declare function closeOpenAICodexWebSocketSessions(sessionId?: string): void;
 //# sourceMappingURL=openai-codex-responses.d.ts.map

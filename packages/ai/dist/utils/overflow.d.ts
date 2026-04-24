@@ -26,6 +26,8 @@ import type { AssistantMessage } from "../types.js";
  * **Unreliable detection:**
  * - z.ai: Sometimes accepts overflow silently (detectable via usage.input > contextWindow),
  *   sometimes returns rate limit errors. Pass contextWindow param to detect silent overflow.
+ * - Xiaomi MiMo: Truncates input to fit contextWindow then returns stopReason "length" with
+ *   output=0. Pass contextWindow param to detect via the "filled context + zero output" signal.
  * - Ollama: May truncate input silently for some setups, but may also return explicit
  *   overflow errors that match the patterns above. Silent truncation still cannot be
  *   detected here because we do not know the expected token count.
