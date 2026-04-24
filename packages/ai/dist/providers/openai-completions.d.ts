@@ -9,7 +9,11 @@ export interface OpenAICompletionsOptions extends StreamOptions {
     };
     reasoningEffort?: "minimal" | "low" | "medium" | "high" | "xhigh";
 }
+type ResolvedOpenAICompletionsCompat = Omit<Required<OpenAICompletionsCompat>, "cacheControlFormat"> & {
+    cacheControlFormat?: OpenAICompletionsCompat["cacheControlFormat"];
+};
 export declare const streamOpenAICompletions: StreamFunction<"openai-completions", OpenAICompletionsOptions>;
 export declare const streamSimpleOpenAICompletions: StreamFunction<"openai-completions", SimpleStreamOptions>;
-export declare function convertMessages(model: Model<"openai-completions">, context: Context, compat: Required<OpenAICompletionsCompat>): ChatCompletionMessageParam[];
+export declare function convertMessages(model: Model<"openai-completions">, context: Context, compat: ResolvedOpenAICompletionsCompat): ChatCompletionMessageParam[];
+export {};
 //# sourceMappingURL=openai-completions.d.ts.map

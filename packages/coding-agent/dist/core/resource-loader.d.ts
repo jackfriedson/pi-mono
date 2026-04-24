@@ -46,9 +46,16 @@ export interface ResourceLoader {
     extendResources(paths: ResourceExtensionPaths): void;
     reload(): Promise<void>;
 }
+export declare function loadProjectContextFiles(options: {
+    cwd: string;
+    agentDir: string;
+}): Array<{
+    path: string;
+    content: string;
+}>;
 export interface DefaultResourceLoaderOptions {
-    cwd?: string;
-    agentDir?: string;
+    cwd: string;
+    agentDir: string;
     settingsManager?: SettingsManager;
     eventBus?: EventBus;
     additionalExtensionPaths?: string[];
@@ -60,8 +67,9 @@ export interface DefaultResourceLoaderOptions {
     noSkills?: boolean;
     noPromptTemplates?: boolean;
     noThemes?: boolean;
+    noContextFiles?: boolean;
     systemPrompt?: string;
-    appendSystemPrompt?: string;
+    appendSystemPrompt?: string[];
     extensionsOverride?: (base: LoadExtensionsResult) => LoadExtensionsResult;
     skillsOverride?: (base: {
         skills: Skill[];
@@ -113,6 +121,7 @@ export declare class DefaultResourceLoader implements ResourceLoader {
     private noSkills;
     private noPromptTemplates;
     private noThemes;
+    private noContextFiles;
     private systemPromptSource?;
     private appendSystemPromptSource?;
     private extensionsOverride?;

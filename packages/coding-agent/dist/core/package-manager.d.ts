@@ -108,7 +108,10 @@ export declare class DefaultPackageManager implements PackageManager {
         local?: boolean;
     }): Promise<boolean>;
     update(source?: string): Promise<void>;
-    private updateSourceForScope;
+    private updateConfiguredSources;
+    private shouldUpdateNpmSource;
+    private updateNpmBatch;
+    private installNpmBatch;
     checkForAvailableUpdates(): Promise<PackageUpdate[]>;
     private resolvePackageSources;
     private resolveLocalExtensionSource;
@@ -146,6 +149,7 @@ export declare class DefaultPackageManager implements PackageManager {
     private parseNpmSpec;
     private getNpmCommand;
     private runNpmCommand;
+    private getGitDependencyInstallArgs;
     private runNpmCommandSync;
     private installNpm;
     private uninstallNpm;
@@ -184,6 +188,9 @@ export declare class DefaultPackageManager implements PackageManager {
     private addResource;
     private createAccumulator;
     private toResolvedPaths;
+    private shouldUseWindowsShell;
+    private spawnCommand;
+    private spawnCaptureCommand;
     private runCommandCapture;
     private runCommand;
     private runCommandSync;

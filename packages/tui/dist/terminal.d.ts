@@ -22,6 +22,7 @@ export interface Terminal {
     clearFromCursor(): void;
     clearScreen(): void;
     setTitle(title: string): void;
+    setProgress(active: boolean): void;
 }
 /**
  * Real terminal using process.stdin/stdout
@@ -34,6 +35,7 @@ export declare class ProcessTerminal implements Terminal {
     private _modifyOtherKeysActive;
     private stdinBuffer?;
     private stdinDataHandler?;
+    private progressInterval?;
     private writeLogPath;
     get kittyProtocolActive(): boolean;
     start(onInput: (data: string) => void, onResize: () => void): void;
@@ -80,5 +82,7 @@ export declare class ProcessTerminal implements Terminal {
     clearFromCursor(): void;
     clearScreen(): void;
     setTitle(title: string): void;
+    setProgress(active: boolean): void;
+    private clearProgressInterval;
 }
 //# sourceMappingURL=terminal.d.ts.map

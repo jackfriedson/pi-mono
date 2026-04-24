@@ -10,6 +10,7 @@ if (typeof process !== "undefined" && (process.versions?.node || process.version
 import { getEnvApiKey } from "../env-api-keys.js";
 import { supportsXhigh } from "../models.js";
 import { AssistantMessageEventStream } from "../utils/event-stream.js";
+import { headersToRecord } from "../utils/headers.js";
 import { convertResponsesMessages, convertResponsesTools, processResponsesStream } from "./openai-responses-shared.js";
 import { buildBaseOptions, clampReasoning } from "./simple-options.js";
 // ============================================================================
@@ -126,6 +127,7 @@ export const streamOpenAICodexResponses = (model, context, options) => {
                         body: bodyJson,
                         signal: options?.signal,
                     });
+                    await options?.onResponse?.({ status: response.status, headers: headersToRecord(response.headers) }, model);
                     if (response.ok) {
                         break;
                     }
@@ -174,6 +176,10 @@ export const streamOpenAICodexResponses = (model, context, options) => {
             stream.end();
         }
         catch (error) {
+            for (const block of output.content) {
+                // partialJson is only a streaming scratch buffer; never persist it.
+                delete block.partialJson;
+            }
             output.stopReason = options?.signal?.aborted ? "aborted" : "error";
             output.errorMessage = error instanceof Error ? error.message : String(error);
             stream.push({ type: "error", reason: output.stopReason, error: output });
@@ -219,7 +225,7 @@ function buildRequestBody(model, context, options) {
     if (options?.serviceTier !== undefined) {
         body.service_tier = options.serviceTier;
     }
-    if (context.tools) {
+    if (context.tools && context.tools.length > 0) {
         body.tools = convertResponsesTools(context.tools, { strict: null });
     }
     if (options?.reasoningEffort !== undefined) {
@@ -232,7 +238,8 @@ function buildRequestBody(model, context, options) {
 }
 function clampReasoningEffort(modelId, effort) {
     const id = modelId.includes("/") ? modelId.split("/").pop() : modelId;
-    if ((id.startsWith("gpt-5.2") || id.startsWith("gpt-5.3") || id.startsWith("gpt-5.4")) && effort === "minimal")
+    if ((id.startsWith("gpt-5.2") || id.startsWith("gpt-5.3") || id.startsWith("gpt-5.4") || id.startsWith("gpt-5.5")) &&
+        effort === "minimal")
         return "low";
     if (id === "gpt-5.1" && effort === "xhigh")
         return "high";
@@ -240,18 +247,18 @@ function clampReasoningEffort(modelId, effort) {
         return effort === "high" || effort === "xhigh" ? "high" : "medium";
     return effort;
 }
-function getServiceTierCostMultiplier(serviceTier) {
+function getServiceTierCostMultiplier(model, serviceTier) {
     switch (serviceTier) {
         case "flex":
             return 0.5;
         case "priority":
-            return 2;
+            return model.id === "gpt-5.5" ? 2.5 : 2;
         default:
             return 1;
     }
 }
-function applyServiceTierPricing(usage, serviceTier) {
-    const multiplier = getServiceTierCostMultiplier(serviceTier);
+function applyServiceTierPricing(usage, serviceTier, model) {
+    const multiplier = getServiceTierCostMultiplier(model, serviceTier);
     if (multiplier === 1)
         return;
     usage.cost.input *= multiplier;
@@ -259,6 +266,12 @@ function applyServiceTierPricing(usage, serviceTier) {
     usage.cost.cacheRead *= multiplier;
     usage.cost.cacheWrite *= multiplier;
     usage.cost.total = usage.cost.input + usage.cost.output + usage.cost.cacheRead + usage.cost.cacheWrite;
+}
+function resolveCodexServiceTier(responseServiceTier, requestServiceTier) {
+    if (responseServiceTier === "default" && (requestServiceTier === "flex" || requestServiceTier === "priority")) {
+        return requestServiceTier;
+    }
+    return responseServiceTier ?? requestServiceTier;
 }
 function resolveCodexUrl(baseUrl) {
     const raw = baseUrl && baseUrl.trim().length > 0 ? baseUrl : DEFAULT_CODEX_BASE_URL;
@@ -283,7 +296,8 @@ function resolveCodexWebSocketUrl(baseUrl) {
 async function processStream(response, output, stream, model, options) {
     await processResponsesStream(mapCodexEvents(parseSSE(response)), output, stream, model, {
         serviceTier: options?.serviceTier,
-        applyServiceTierPricing,
+        resolveServiceTier: resolveCodexServiceTier,
+        applyServiceTierPricing: (usage, serviceTier) => applyServiceTierPricing(usage, serviceTier, model),
     });
 }
 async function* mapCodexEvents(events) {
@@ -374,13 +388,6 @@ function getWebSocketConstructor() {
     if (typeof ctor !== "function")
         return null;
     return ctor;
-}
-function headersToRecord(headers) {
-    const out = {};
-    for (const [key, value] of headers.entries()) {
-        out[key] = value;
-    }
-    return out;
 }
 function getWebSocketReadyState(socket) {
     const readyState = socket.readyState;
@@ -670,7 +677,8 @@ async function processWebSocketStream(url, body, headers, output, stream, model,
         stream.push({ type: "start", partial: output });
         await processResponsesStream(mapCodexEvents(parseWebSocket(socket, options?.signal)), output, stream, model, {
             serviceTier: options?.serviceTier,
-            applyServiceTierPricing,
+            resolveServiceTier: resolveCodexServiceTier,
+            applyServiceTierPricing: (usage, serviceTier) => applyServiceTierPricing(usage, serviceTier, model),
         });
         if (options?.signal?.aborted) {
             keepConnection = false;
@@ -753,6 +761,7 @@ function buildSSEHeaders(initHeaders, additionalHeaders, accountId, token, sessi
     headers.set("content-type", "application/json");
     if (sessionId) {
         headers.set("session_id", sessionId);
+        headers.set("x-client-request-id", sessionId);
     }
     return headers;
 }

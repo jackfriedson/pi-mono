@@ -1,4 +1,4 @@
-import { type TUnsafe } from "@sinclair/typebox";
+import { type TUnsafe } from "typebox";
 /**
  * Creates a string enum schema compatible with Google's API and other providers
  * that don't support anyOf/const patterns.

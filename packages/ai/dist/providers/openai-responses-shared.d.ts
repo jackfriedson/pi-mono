@@ -3,6 +3,7 @@ import type { Api, AssistantMessage, Context, Model, Tool, Usage } from "../type
 import type { AssistantMessageEventStream } from "../utils/event-stream.js";
 export interface OpenAIResponsesStreamOptions {
     serviceTier?: ResponseCreateParamsStreaming["service_tier"];
+    resolveServiceTier?: (responseServiceTier: ResponseCreateParamsStreaming["service_tier"] | undefined, requestServiceTier: ResponseCreateParamsStreaming["service_tier"] | undefined) => ResponseCreateParamsStreaming["service_tier"] | undefined;
     applyServiceTierPricing?: (usage: Usage, serviceTier: ResponseCreateParamsStreaming["service_tier"] | undefined) => void;
 }
 export interface ConvertResponsesMessagesOptions {

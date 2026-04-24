@@ -7,6 +7,7 @@
  */
 import { oauthErrorHtml, oauthSuccessHtml } from "./oauth-page.js";
 import { generatePKCE } from "./pkce.js";
+const CALLBACK_HOST = process.env.PI_OAUTH_CALLBACK_HOST || "127.0.0.1";
 let _createServer = null;
 let _httpImportPromise = null;
 if (typeof process !== "undefined" && (process.versions?.node || process.versions?.bun)) {
@@ -86,7 +87,7 @@ async function startCallbackServer() {
         server.on("error", (err) => {
             reject(err);
         });
-        server.listen(51121, "127.0.0.1", () => {
+        server.listen(51121, CALLBACK_HOST, () => {
             resolve({
                 server,
                 cancelWait: () => {

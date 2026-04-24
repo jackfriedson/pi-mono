@@ -24,6 +24,8 @@ export declare function setCellDimensions(dims: CellDimensions): void;
 export declare function detectCapabilities(): TerminalCapabilities;
 export declare function getCapabilities(): TerminalCapabilities;
 export declare function resetCapabilitiesCache(): void;
+/** Override the cached capabilities. Useful in tests to exercise both code paths. */
+export declare function setCapabilities(caps: TerminalCapabilities): void;
 export declare function isImageLine(line: string): boolean;
 /**
  * Generate a random image ID for Kitty graphics protocol.
@@ -64,5 +66,16 @@ export declare function renderImage(base64Data: string, imageDimensions: ImageDi
     rows: number;
     imageId?: number;
 } | null;
+/**
+ * Wrap text in an OSC 8 hyperlink sequence.
+ * The text is rendered as a clickable hyperlink in terminals that support OSC 8
+ * (Ghostty, Kitty, WezTerm, iTerm2, VSCode, and others).
+ * In terminals that do not support OSC 8, the escape sequences are ignored
+ * and only the plain text is displayed.
+ *
+ * @param text - The visible text to display
+ * @param url - The URL to link to
+ */
+export declare function hyperlink(text: string, url: string): string;
 export declare function imageFallback(mimeType: string, dimensions?: ImageDimensions, filename?: string): string;
 //# sourceMappingURL=terminal-image.d.ts.map

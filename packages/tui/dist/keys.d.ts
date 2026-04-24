@@ -31,19 +31,23 @@ type Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 type SymbolKey = "`" | "-" | "=" | "[" | "]" | "\\" | ";" | "'" | "," | "." | "/" | "!" | "@" | "#" | "$" | "%" | "^" | "&" | "*" | "(" | ")" | "_" | "+" | "|" | "~" | "{" | "}" | ":" | "<" | ">" | "?";
 type SpecialKey = "escape" | "esc" | "enter" | "return" | "tab" | "space" | "backspace" | "delete" | "insert" | "clear" | "home" | "end" | "pageUp" | "pageDown" | "up" | "down" | "left" | "right" | "f1" | "f2" | "f3" | "f4" | "f5" | "f6" | "f7" | "f8" | "f9" | "f10" | "f11" | "f12";
 type BaseKey = Letter | Digit | SymbolKey | SpecialKey;
+type ModifierName = "ctrl" | "shift" | "alt" | "super";
+type ModifiedKeyId<Key extends string, RemainingModifiers extends ModifierName = ModifierName> = {
+    [M in RemainingModifiers]: `${M}+${Key}` | `${M}+${ModifiedKeyId<Key, Exclude<RemainingModifiers, M>>}`;
+}[RemainingModifiers];
 /**
  * Union type of all valid key identifiers.
  * Provides autocomplete and catches typos at compile time.
  */
-export type KeyId = BaseKey | `ctrl+${BaseKey}` | `shift+${BaseKey}` | `alt+${BaseKey}` | `ctrl+shift+${BaseKey}` | `shift+ctrl+${BaseKey}` | `ctrl+alt+${BaseKey}` | `alt+ctrl+${BaseKey}` | `shift+alt+${BaseKey}` | `alt+shift+${BaseKey}` | `ctrl+shift+alt+${BaseKey}` | `ctrl+alt+shift+${BaseKey}` | `shift+ctrl+alt+${BaseKey}` | `shift+alt+ctrl+${BaseKey}` | `alt+ctrl+shift+${BaseKey}` | `alt+shift+ctrl+${BaseKey}`;
+export type KeyId = BaseKey | ModifiedKeyId<BaseKey>;
 /**
  * Helper object for creating typed key identifiers with autocomplete.
  *
  * Usage:
  * - Key.escape, Key.enter, Key.tab, etc. for special keys
  * - Key.backtick, Key.comma, Key.period, etc. for symbol keys
- * - Key.ctrl("c"), Key.alt("x") for single modifier
- * - Key.ctrlShift("p"), Key.ctrlAlt("x") for combined modifiers
+ * - Key.ctrl("c"), Key.alt("x"), Key.super("k") for single modifiers
+ * - Key.ctrlShift("p"), Key.ctrlAlt("x"), Key.ctrlSuper("k") for combined modifiers
  */
 export declare const Key: {
     readonly escape: "escape";
@@ -110,13 +114,21 @@ export declare const Key: {
     readonly ctrl: <K extends BaseKey>(key: K) => `ctrl+${K}`;
     readonly shift: <K extends BaseKey>(key: K) => `shift+${K}`;
     readonly alt: <K extends BaseKey>(key: K) => `alt+${K}`;
+    readonly super: <K extends BaseKey>(key: K) => `super+${K}`;
     readonly ctrlShift: <K extends BaseKey>(key: K) => `ctrl+shift+${K}`;
     readonly shiftCtrl: <K extends BaseKey>(key: K) => `shift+ctrl+${K}`;
     readonly ctrlAlt: <K extends BaseKey>(key: K) => `ctrl+alt+${K}`;
     readonly altCtrl: <K extends BaseKey>(key: K) => `alt+ctrl+${K}`;
     readonly shiftAlt: <K extends BaseKey>(key: K) => `shift+alt+${K}`;
     readonly altShift: <K extends BaseKey>(key: K) => `alt+shift+${K}`;
+    readonly ctrlSuper: <K extends BaseKey>(key: K) => `ctrl+super+${K}`;
+    readonly superCtrl: <K extends BaseKey>(key: K) => `super+ctrl+${K}`;
+    readonly shiftSuper: <K extends BaseKey>(key: K) => `shift+super+${K}`;
+    readonly superShift: <K extends BaseKey>(key: K) => `super+shift+${K}`;
+    readonly altSuper: <K extends BaseKey>(key: K) => `alt+super+${K}`;
+    readonly superAlt: <K extends BaseKey>(key: K) => `super+alt+${K}`;
     readonly ctrlShiftAlt: <K extends BaseKey>(key: K) => `ctrl+shift+alt+${K}`;
+    readonly ctrlShiftSuper: <K extends BaseKey>(key: K) => `ctrl+shift+super+${K}`;
 };
 /**
  * Event types from Kitty keyboard protocol (flag 2)
@@ -142,9 +154,10 @@ export declare function isKeyRepeat(data: string): boolean;
  * - Ctrl combinations: "ctrl+c", "ctrl+z", etc.
  * - Shift combinations: "shift+tab", "shift+enter"
  * - Alt combinations: "alt+enter", "alt+backspace"
- * - Combined modifiers: "shift+ctrl+p", "ctrl+alt+x"
+ * - Super combinations: "super+k", "super+enter"
+ * - Combined modifiers: "shift+ctrl+p", "ctrl+alt+x", "ctrl+super+k"
  *
- * Use the Key helper for autocomplete: Key.ctrl("c"), Key.escape, Key.ctrlShift("p")
+ * Use the Key helper for autocomplete: Key.ctrl("c"), Key.escape, Key.ctrlShift("p"), Key.super("k")
  *
  * @param data - Raw input data from terminal
  * @param keyId - Key identifier (e.g., "ctrl+c", "escape", Key.ctrl("c"))
@@ -166,5 +179,6 @@ export declare function parseKey(data: string): string | undefined;
  * @returns The printable character, or undefined if not a printable CSI-u sequence
  */
 export declare function decodeKittyPrintable(data: string): string | undefined;
+export declare function decodePrintableKey(data: string): string | undefined;
 export {};
 //# sourceMappingURL=keys.d.ts.map

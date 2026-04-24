@@ -49,6 +49,7 @@ export declare function getInteractiveAssetsDir(): string;
 /** Get path to a bundled interactive asset */
 export declare function getBundledInteractiveAssetPath(name: string): string;
 export declare const APP_NAME: string;
+export declare const APP_TITLE: string;
 export declare const CONFIG_DIR_NAME: string;
 export declare const VERSION: string;
 export declare const ENV_AGENT_DIR: string;

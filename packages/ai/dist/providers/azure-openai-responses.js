@@ -2,6 +2,7 @@ import { AzureOpenAI } from "openai";
 import { getEnvApiKey } from "../env-api-keys.js";
 import { supportsXhigh } from "../models.js";
 import { AssistantMessageEventStream } from "../utils/event-stream.js";
+import { headersToRecord } from "../utils/headers.js";
 import { convertResponsesMessages, convertResponsesTools, processResponsesStream } from "./openai-responses-shared.js";
 import { buildBaseOptions, clampReasoning } from "./simple-options.js";
 const DEFAULT_AZURE_API_VERSION = "v1";
@@ -62,7 +63,13 @@ export const streamAzureOpenAIResponses = (model, context, options) => {
             if (nextParams !== undefined) {
                 params = nextParams;
             }
-            const openaiStream = await client.responses.create(params, options?.signal ? { signal: options.signal } : undefined);
+            const requestOptions = {
+                ...(options?.signal ? { signal: options.signal } : {}),
+                ...(options?.timeoutMs !== undefined ? { timeout: options.timeoutMs } : {}),
+                ...(options?.maxRetries !== undefined ? { maxRetries: options.maxRetries } : {}),
+            };
+            const { data: openaiStream, response } = await client.responses.create(params, requestOptions).withResponse();
+            await options?.onResponse?.({ status: response.status, headers: headersToRecord(response.headers) }, model);
             stream.push({ type: "start", partial: output });
             await processResponsesStream(openaiStream, output, stream, model);
             if (options?.signal?.aborted) {
@@ -75,8 +82,11 @@ export const streamAzureOpenAIResponses = (model, context, options) => {
             stream.end();
         }
         catch (error) {
-            for (const block of output.content)
+            for (const block of output.content) {
                 delete block.index;
+                // partialJson is only a streaming scratch buffer; never persist it.
+                delete block.partialJson;
+            }
             output.stopReason = options?.signal?.aborted ? "aborted" : "error";
             output.errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
             stream.push({ type: "error", reason: output.stopReason, error: output });
@@ -156,7 +166,7 @@ function buildParams(model, context, options, deploymentName) {
     if (options?.temperature !== undefined) {
         params.temperature = options?.temperature;
     }
-    if (context.tools) {
+    if (context.tools && context.tools.length > 0) {
         params.tools = convertResponsesTools(context.tools);
     }
     if (model.reasoning) {

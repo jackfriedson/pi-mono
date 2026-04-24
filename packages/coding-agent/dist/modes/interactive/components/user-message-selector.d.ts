@@ -13,7 +13,7 @@ declare class UserMessageList implements Component {
     onSelect?: (entryId: string) => void;
     onCancel?: () => void;
     private maxVisible;
-    constructor(messages: UserMessageItem[]);
+    constructor(messages: UserMessageItem[], initialSelectedId?: string);
     invalidate(): void;
     render(width: number): string[];
     handleInput(keyData: string): void;
@@ -23,7 +23,7 @@ declare class UserMessageList implements Component {
  */
 export declare class UserMessageSelectorComponent extends Container {
     private messageList;
-    constructor(messages: UserMessageItem[], onSelect: (entryId: string) => void, onCancel: () => void);
+    constructor(messages: UserMessageItem[], onSelect: (entryId: string) => void, onCancel: () => void, initialSelectedId?: string);
     getMessageList(): UserMessageList;
 }
 export {};

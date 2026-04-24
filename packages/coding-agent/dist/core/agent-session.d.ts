@@ -16,7 +16,7 @@ import type { Agent, AgentEvent, AgentMessage, AgentState, AgentTool, ThinkingLe
 import type { ImageContent, Model, TextContent } from "@mariozechner/pi-ai";
 import { type BashResult } from "./bash-executor.js";
 import { type CompactionResult } from "./compaction/index.js";
-import { type ContextUsage, type ExtensionCommandContextActions, type ExtensionErrorListener, ExtensionRunner, type ExtensionUIContext, type InputSource, type SessionStartEvent, type ShutdownHandler, type ToolDefinition, type ToolInfo } from "./extensions/index.js";
+import { type ContextUsage, type ExtensionCommandContextActions, type ExtensionErrorListener, ExtensionRunner, type ExtensionUIContext, type InputSource, type ReplacedSessionContext, type SessionStartEvent, type ShutdownHandler, type ToolDefinition, type ToolInfo } from "./extensions/index.js";
 import type { CustomMessage } from "./messages.js";
 import type { ModelRegistry } from "./model-registry.js";
 import { type PromptTemplate } from "./prompt-templates.js";
@@ -83,6 +83,8 @@ export interface AgentSessionConfig {
     modelRegistry: ModelRegistry;
     /** Initial active built-in tool names. Default: [read, bash, edit, write] */
     initialActiveToolNames?: string[];
+    /** Optional allowlist of tool names. When provided, only these tool names are exposed. */
+    allowedToolNames?: string[];
     /**
      * Override base tools (useful for custom runtimes).
      *
@@ -113,6 +115,8 @@ export interface PromptOptions {
     streamingBehavior?: "steer" | "followUp";
     /** Source of input for extension input event handlers. Defaults to "interactive". */
     source?: InputSource;
+    /** Internal hook used by RPC mode to observe prompt preflight acceptance or rejection. */
+    preflightResult?: (success: boolean) => void;
 }
 /** Result from cycleModel() */
 export interface ModelCycleResult {
@@ -172,6 +176,7 @@ export declare class AgentSession {
     private _cwd;
     private _extensionRunnerRef?;
     private _initialActiveToolNames?;
+    private _allowedToolNames?;
     private _baseToolsOverride?;
     private _sessionStartEvent;
     private _extensionUIContext?;
@@ -185,6 +190,7 @@ export declare class AgentSession {
     private _toolPromptSnippets;
     private _toolPromptGuidelines;
     private _baseSystemPrompt;
+    private _baseSystemPromptOptions;
     constructor(config: AgentSessionConfig);
     /** Model registry for API key resolution and model discovery */
     get modelRegistry(): ModelRegistry;
@@ -569,6 +575,7 @@ export declare class AgentSession {
      * @returns Text content, or undefined if no assistant message exists
      */
     getLastAssistantText(): string | undefined;
+    createReplacedSessionContext(): ReplacedSessionContext;
     /**
      * Check if extensions have handlers for a specific event type.
      */
@@ -576,6 +583,6 @@ export declare class AgentSession {
     /**
      * Get the extension runner (for setting UI context and error handlers).
      */
-    get extensionRunner(): ExtensionRunner | undefined;
+    get extensionRunner(): ExtensionRunner;
 }
 //# sourceMappingURL=agent-session.d.ts.map

@@ -4,6 +4,7 @@ import { Container, SettingsList } from "@mariozechner/pi-tui";
 export interface SettingsConfig {
     autoCompact: boolean;
     showImages: boolean;
+    imageWidthCells: number;
     autoResizeImages: boolean;
     blockImages: boolean;
     enableSkillCommands: boolean;
@@ -24,10 +25,12 @@ export interface SettingsConfig {
     autocompleteMaxVisible: number;
     quietStartup: boolean;
     clearOnShrink: boolean;
+    showTerminalProgress: boolean;
 }
 export interface SettingsCallbacks {
     onAutoCompactChange: (enabled: boolean) => void;
     onShowImagesChange: (enabled: boolean) => void;
+    onImageWidthCellsChange: (width: number) => void;
     onAutoResizeImagesChange: (enabled: boolean) => void;
     onBlockImagesChange: (blocked: boolean) => void;
     onEnableSkillCommandsChange: (enabled: boolean) => void;
@@ -47,6 +50,7 @@ export interface SettingsCallbacks {
     onAutocompleteMaxVisibleChange: (maxVisible: number) => void;
     onQuietStartupChange: (enabled: boolean) => void;
     onClearOnShrinkChange: (enabled: boolean) => void;
+    onShowTerminalProgressChange: (enabled: boolean) => void;
     onCancel: () => void;
 }
 /**

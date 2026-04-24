@@ -4,10 +4,9 @@ import { AuthStorage } from "./auth-storage.js";
 import type { SessionStartEvent, ToolDefinition } from "./extensions/index.js";
 import { ModelRegistry } from "./model-registry.js";
 import { type DefaultResourceLoaderOptions, type ResourceLoader } from "./resource-loader.js";
-import { type CreateAgentSessionResult } from "./sdk.js";
+import { type CreateAgentSessionOptions, type CreateAgentSessionResult } from "./sdk.js";
 import type { SessionManager } from "./session-manager.js";
 import { SettingsManager } from "./settings-manager.js";
-import type { Tool } from "./tools/index.js";
 /**
  * Non-fatal issues collected while creating services or sessions.
  *
@@ -51,7 +50,8 @@ export interface CreateAgentSessionFromServicesOptions {
         model: Model<any>;
         thinkingLevel?: ThinkingLevel;
     }>;
-    tools?: Tool[];
+    tools?: string[];
+    noTools?: CreateAgentSessionOptions["noTools"];
     customTools?: ToolDefinition[];
 }
 /**
